@@ -1,11 +1,25 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
+import RegisterSU from "./contracts/RegisterSU.json";
 import getWeb3 from "./getWeb3";
 
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      courseCode: "",
+      courseId: 0,
+      courseCapacity: 0,
+      web3: null,
+      accounts: null,
+      contract: null
+    };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
   componentDidMount = async () => {
     try {
@@ -17,9 +31,9 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = RegisterSU.networks[networkId];
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+        RegisterSU.abi,
         deployedNetwork && deployedNetwork.address,
       );
 
@@ -35,36 +49,45 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
-    const { accounts, contract } = this.state;
+  async handleSubmit(event) {
+    const code = this.state.courseCode;
+    const id = this.state.courseId;
+    const capacity = this.state.courseCapacity;
+    console.log(code, id, capacity);
+    event.preventDefault();
 
-    // Stores a given value, 5 by default.
-    await contract.methods.set(10).send({ from: accounts[0] });
+    let result = await this.state.contract.methods.createCourse(id, code, capacity).send({ from: this.state.accounts[0] })
+    console.log(result)
+  }
 
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
 
-    // Update state with the result.
-    this.setState({ storageValue: response });
-  };
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
     return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Course Code:
+            <input type="text" name="courseCode" value={this.state.courseCode} onChange={this.handleInputChange} />
+          </label>
+          <label>
+            Course ID
+            <input type="number" name="courseId" value={this.state.courseId} onChange={this.handleInputChange} />
+          </label>
+          <label>
+            Course Capacity
+            <input type="number" name="courseCapacity" value={this.state.courseCapacity} onChange={this.handleInputChange} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
       </div>
     );
   }
