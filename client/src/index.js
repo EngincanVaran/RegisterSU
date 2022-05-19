@@ -8,6 +8,7 @@ import history from './history';
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
 import AddCourse from "./AddCourse";
+import LoginPage from "./loginpg";
 import AddCourse3 from "./AddCourse3";
 import {
     BrowserRouter as Router,
@@ -27,6 +28,7 @@ ReactDOM.render(
           <Switch>
             <Route exact path='/' component={Login} /> 
             <Route path="/AddCourse" component={AddCourse} /> 
+            <Route path="/loginpg" component={LoginPage} />
             <Route path="/AddCoursee" component={AddCourse3} />
           </Switch>
         </Router>
