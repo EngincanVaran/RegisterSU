@@ -9,6 +9,7 @@ import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
 import AddCourse from "./AddCourse3";
 import CloseCourse from "./CloseCourse";
+import RegisterCourse from "./RegisterCourse";
 import {
     BrowserRouter as Router,
     Route,
@@ -21,19 +22,20 @@ import {
 // Learn more about service workers: https://bit.ly/CRA-PWA
 
 ReactDOM.render(
-    <ThemeContextWrapper>
-      <BackgroundColorWrapper>
-        <Router history={history}>
-          <Switch>
-            <Route exact path='/' component={Login} /> 
-            <Route path="/AddCourse" component={AddCourse} />
-            <Route path="/CloseCourse" component={CloseCourse} />
-          </Switch>
-        </Router>
-      </BackgroundColorWrapper>
-    </ThemeContextWrapper>,
-    document.getElementById('root')
-  );
+  <ThemeContextWrapper>
+    <BackgroundColorWrapper>
+      <Router history={history}>
+        <Switch>
+          <Route exact path='/' component={Login} /> 
+          <Route path="/AddCourse" component={AddCourse} /> 
+          <Route path="/CloseCourse" component={CloseCourse} />
+          <Route path="/RegisterCourse" component={RegisterCourse} />
+        </Switch>
+      </Router>
+    </BackgroundColorWrapper>
+  </ThemeContextWrapper>,
+  document.getElementById('root')
+);
 serviceWorker.unregister();
 
 //export default App;
