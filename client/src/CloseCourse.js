@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import RegisterSU from "./contracts/RegisterSU.json";
 import getWeb3 from "./getWeb3";
-
 import {
     Button,
     Card,
@@ -15,8 +14,7 @@ import {
     Row,
     Col,
 } from "reactstrap";
-import { Spinner,   FormFile} from 'react-bootstrap';
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 class App extends Component {
 
@@ -25,7 +23,6 @@ class App extends Component {
         this.state = {
         courseCode: "",
         courseId: 0,
-        courseCapacity: 0,
         web3: null,
         accounts: null,
         contract: null
@@ -64,11 +61,10 @@ class App extends Component {
       async handleSubmit(event) {
         const code = this.state.courseCode;
         const id = this.state.courseId;
-        const capacity = this.state.courseCapacity;
-        console.log(code, id, capacity);
+        console.log(code, id);
         event.preventDefault();
     
-        let result = await this.state.contract.methods.createCourse(id, code, capacity).send({ from: this.state.accounts[0] })
+        let result = await this.state.contract.methods.closeCourse(id).send({ from: this.state.accounts[0] })
         console.log(result)
       }
     
@@ -87,16 +83,17 @@ class App extends Component {
           <Col md="8">
             <Card>
               <CardHeader>
-                <h5 className="title">Add Course</h5>
+                <h5 className="title">Close Course</h5>
               </CardHeader>
               <CardBody>
                 <Form>
                   <Row>
                     <Col md="12">
                       <FormGroup>
-                        <label>courseCode (in sqm.)</label>
+                        <label>Course Code</label>
                         <Input
                           placeholder="Course Code"
+                          name="courseCode"
                           type="text"
                           value={this.state.courseCode}
                           onChange={this.handleInputChange}
@@ -108,39 +105,22 @@ class App extends Component {
                   <Row>
                     <Col md="12">
                       <FormGroup>
-                        <label>courseId</label>
+                        <label>Course Id</label>
                         <Input
                           placeholder="Course Id"
+                          name="courseId"
                           type="text"
                           value={this.state.courseId}
                           onChange={this.handleInputChange}
                         />
                       </FormGroup>
                     </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                      <FormGroup>
-                        <label>courseCapacity</label>
-                        <Input
-                          placeholder="Course Capacity"
-                          type="text"
-                          value={this.state.courseCapacity}
-                          onChange={this.handleInputChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                  </Row>
-                  
-                  
-                  
-                  
-                  
+                  </Row>                 
                 </Form>
               </CardBody>
               <CardFooter>
-                <Button className="btn-fill" color="primary" onClick={this.addLand}>
-                  Add Course
+                <Button className="btn-fill" color="primary" onClick={this.handleSubmit}>
+                  Close Course
                 </Button>
               </CardFooter>
             </Card>
@@ -150,3 +130,5 @@ class App extends Component {
         );
       }
 }
+
+export default App;
