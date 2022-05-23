@@ -1,100 +1,116 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "./StudentResources.sol";
+contract RegisterSU {
 
-contract RegisterSU is StudentResources {
-    enum CourseRegistrationStatus {
-        Open,
-        Closed
+    struct Courses{
+        uint id;
+        bool status;
+        string courseCode;
+        uint courseMaxCapacity;
+        uint courseCapacity;
+        address[] students;
     }
 
-    struct Course {
-        RegisterSU.CourseRegistrationStatus _status;
-        string _courseCode;
-        uint256 _courseMaxCapacity;
-        uint256 _courseCapacity;
-        address[] _students;
+    struct Students {
+        address id;
+        string studentId;
+        string username;
+        uint[] courses;
+    }
+    
+    struct StudentResources{
+        address id;
     }
 
-    mapping(uint256 => Course) public courses;
-    uint256[] public courseList;
-    uint256[] public myCourses;
-
-    function createCourse(
-        uint256 _id,
-        string memory _courseCode,
-        uint256 _courseMaxCapacity
-    ) public onlySR {
-        courses[_id]._courseCode = _courseCode;
-        courses[_id]._courseMaxCapacity = _courseMaxCapacity;
-
-        courses[_id]._courseCapacity = 0;
-        courses[_id]._status = CourseRegistrationStatus.Closed;
-        courses[_id]._students = new address[](0);
-
-        courseList.push(_id);
+    struct CourseRequest{
+        uint reqId;
+        address studentId;
+        uint courseId;
     }
 
-    function openCourse(uint256 _courseIndex) public onlySR {
-        require(
-            courses[_courseIndex]._status != CourseRegistrationStatus.Open,
-            "Course is already Open!"
-        );
+    mapping(uint => Courses) public courses;
+    mapping(address => Students) public StudentMapping;
+    mapping(address => StudentResources) public StudentResourcesMapping;
+    mapping(uint => CourseRequest) public RequestsMapping;
 
-        courses[_courseIndex]._status = CourseRegistrationStatus.Open;
+    mapping(address => bool) public RegisteredAddressMapping;
+    mapping(address => bool) public RegisteredStudentsMapping;
+    mapping(address => bool) public RegisteredStudentResourcesMapping;
+
+    address[] public students;
+    address[] public studentResources;
+
+    uint public coursesCount;
+    uint public studentResourcesCount;
+    uint public studentsCount;
+    uint public requestsCount;
+
+    event Registration(address _registrationId);
+    event AddingCourse(uint indexed _landId);
+    event Courserequested(address _sellerId);
+
+    constructor() public payable{
+    }
+    
+    function getCoursesCount() public view returns (uint) {
+        return coursesCount;
     }
 
-    function closeCourse(uint256 _courseIndex) public onlySR {
-        require(
-            courses[_courseIndex]._status != CourseRegistrationStatus.Closed,
-            "Course is already Closed!"
-        );
-
-        courses[_courseIndex]._status = CourseRegistrationStatus.Closed;
+    function getStudentsCount() public view returns (uint) {
+        return studentsCount;
     }
 
-    function registerCourse(uint256 _courseIndex) public {
-        require(!isSR(), "Student Resources cannot register to a course!");
-        require(
-            courses[_courseIndex]._status != CourseRegistrationStatus.Closed,
-            "Course is Closed!"
-        );
-        require(
-            courses[_courseIndex]._courseCapacity <
-                courses[_courseIndex]._courseMaxCapacity,
-            "Course is at Max Capacity!"
-        );
-
-        courses[_courseIndex]._students.push(msg.sender);
-        courses[_courseIndex]._courseCapacity += 1;
+    function getStudentResourcesCount() public view returns (uint) {
+        return studentResourcesCount;
     }
 
-    function getCourseStudents(uint256 _courseIndex)
-        public
-        view
-        onlySR
-        returns (address[] memory)
-    {
-        return courses[_courseIndex]._students;
+    function getRequestsCount() public view returns (uint) {
+        return requestsCount;
     }
 
-    function setMyCourses() internal {
-        for (uint256 i = 0; i < courseList.length; i += 1) {
-            for (
-                uint256 j = 0;
-                j < courses[courseList[i]]._students.length;
-                j += 1
-            ) {
-                if (courses[courseList[i]]._students[j] == msg.sender) {
-                    myCourses.push(courseList[i]);
-                }
-            }
+   //registration of studentResources
+    function registerStudentResources() public {
+        //require that StudentResources is not already registered
+        require(!RegisteredAddressMapping[msg.sender]);
+
+        RegisteredAddressMapping[msg.sender] = true;
+        RegisteredStudentResourcesMapping[msg.sender] = true ;
+        studentResourcesCount++;
+        StudentResourcesMapping[msg.sender] = StudentResources(msg.sender);
+        studentResources.push(msg.sender);
+        emit Registration(msg.sender);
+    }
+
+    //registration of students
+    function registerStudents(string memory _studentId, string memory _username) public {
+        //require that student is not already registered
+        require(!RegisteredAddressMapping[msg.sender]);
+        require(bytes(_studentId).length > 0);
+        require(bytes(_username).length > 0);
+
+
+        RegisteredAddressMapping[msg.sender] = true;
+        RegisteredStudentsMapping[msg.sender] = true ;
+        studentsCount++;
+
+        uint[] memory sCourses = new uint[](7);
+        StudentMapping[msg.sender] = Students(msg.sender, _studentId, _username, sCourses);
+        students.push(msg.sender);
+        emit Registration(msg.sender);
+    }
+
+    function isStudentResources(address _id) public view returns (bool) {
+        if(RegisteredStudentResourcesMapping[_id]){
+            return true;
         }
     }
 
-    function getMyCourses() public returns (uint256[] memory) {
-        setMyCourses();
-        return myCourses;
+    function isStudent(address _id) public view returns (bool) {
+        if(RegisteredStudentsMapping[_id]){
+            return true;
+        }
     }
+
 }
