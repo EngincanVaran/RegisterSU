@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import LoginPage from './Pages/LoginPage';
 import history from './history';
 import HealthPage from './Pages/HealthPage';
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
@@ -10,6 +9,10 @@ import BackgroundColorWrapper from "./components/BackgroundColorWrapper/Backgrou
 import AddCourse from "./Pages/AddCourse3"
 import CloseCourse from "./Pages/CloseCourse";
 import RegisterCourse from "./Pages/RegisterCourse";
+import RegisterStudent from "./Pages/RegisterStudent";
+import RegisterSR from "./Pages/RegisterSr";
+import Landing from "./Pages/LandingPage";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -26,10 +29,12 @@ ReactDOM.render(
     <BackgroundColorWrapper>
       <Router history={history}>
         <Switch>
-          <Route exact path='/' component={LoginPage} />
+          <Route exact path='/' component={Landing} />
           <Route path="/AddCourse" component={AddCourse} />
           <Route path="/CloseCourse" component={CloseCourse} />
           <Route path="/RegisterCourse" component={RegisterCourse} />
+          <Route path="/RegisterStudent" component={RegisterStudent} />
+          <Route path="/RegisterSR" component={RegisterSR} />
           <Route path="/health" component={HealthPage} />
         </Switch>
       </Router>
