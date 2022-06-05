@@ -10,6 +10,8 @@ import BackgroundColorWrapper from "./components/BackgroundColorWrapper/Backgrou
 import AddCourse from "./AddCourse";
 import LoginPage from "./loginpg";
 import AddCourse3 from "./AddCourse3";
+import ProfilePage from "./profilecard";
+
 import {
     BrowserRouter as Router,
     Route,
@@ -30,6 +32,7 @@ ReactDOM.render(
             <Route path="/AddCourse" component={AddCourse} /> 
             <Route path="/loginpg" component={LoginPage} />
             <Route path="/AddCoursee" component={AddCourse3} />
+            <Route path="/profilecard" component={ProfilePage} />
           </Switch>
         </Router>
       </BackgroundColorWrapper>

@@ -368,6 +368,89 @@ body, html, .App, #root, .auth-wrapper {
   box-shadow: 0 15px 40px rgba(0,0,0,0.5);
 }
 
+.avatar {
+  display: flex;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #b6afaf;
+  flex-shrink: 0;
+
+}
+
+.info-container{
+  display: flex;
+  align-items: center;
+  margin-left: 10%;
+  width: 60%;
+  height: 100%;
+}
+
+
+.info-container .btn-1-c{
+
+    margin-left: 10%;
+    width: 50%;
+}
+
+.info-container .btn-3-c{
+
+  margin-left: 3%;
+}
+
+.container-profile{
+  width: 80%;
+  height: 160px;
+  border: 2px solid #fff;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+
+.container-profile-2 .info-container .overwievc{
+  margin-top: 1%;
+  color: rgb(216, 208, 208);
+}
+
+.container-profile-2{
+  width: 80%;
+  height: 80px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  margin: 0 auto;
+  background-color: #666666;
+}
+
+.container-profile-3{
+  width: 80%;
+  height: auto;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+
+.lecture-card img{
+  width: 58;
+  height: 80;
+  object-fit: cover;
+}
+
+.lecture-card{
+  display:flex;
+width: 25%;
+}
+
+.lecture-card .closebutton{
+  margin-top: 20%;
+}
+
+.container-profile .info-container .name-content{
+  width: 100%;
+  margin-top: 1%;
+  vertical-align: center;
+}
+
+.container-profile .info-container .name-content p{
+  font-size: 28px;
+  margin-left: 25px;
+}
 
 .formBox{
   display: flex;

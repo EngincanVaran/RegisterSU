@@ -75,7 +75,7 @@ export default class Login extends Component {
                                     color: "#696969",
                                     height: 1
                                 }}
-                            />
+                            />                      
 
                             <div class="form-group" style={{ color: "black" }}>
                                 <label class="control-label" for="Company" style={{ fontSize: "18px", padding: "2px" }}>Select Role</label>
