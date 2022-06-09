@@ -1,10 +1,5 @@
 import React, { Component } from "react";
 import './index.css';
-import history from './history';
-import { Redirect } from 'react-router-dom';
-import { Button } from "reactstrap";
-import getWeb3 from "./getWeb3";
-import RegisterSU from "./contracts/RegisterSU.json";
 
 export default class ProfilePage extends Component {
 
