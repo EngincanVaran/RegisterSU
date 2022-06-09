@@ -12,6 +12,7 @@ import RegisterCourse from "./Pages/RegisterCourse";
 import RegisterStudent from "./Pages/RegisterStudent";
 import RegisterSR from "./Pages/RegisterSr";
 import Landing from "./Pages/LandingPage";
+import ProfilePage from "./Pages/ProfilePage";
 
 import {
   BrowserRouter as Router,
@@ -36,6 +37,7 @@ ReactDOM.render(
           <Route path="/RegisterStudent" component={RegisterStudent} />
           <Route path="/RegisterSR" component={RegisterSR} />
           <Route path="/health" component={HealthPage} />
+          <Route path="/profilecard" component={ProfilePage} />
         </Switch>
       </Router>
     </BackgroundColorWrapper>
