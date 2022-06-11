@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import RegisterSU from "../contracts/RegisterSU.json";
 //import { Button } from "reactstrap";
 import getWeb3 from "../getWeb3";
-import { FormGroup, FormControl, Button} from 'react-bootstrap'
+import { FormGroup, FormControl, Button } from 'react-bootstrap'
 
 import '../index.css';
 
@@ -17,10 +17,9 @@ export default class LoginPage extends Component {
             contract: null,
             student: null,
             username: '',
-            id:'',
-            studentResources: null
-            
-
+            id: '',
+            studentResources: null,
+            maxCourseNumber: 5,
         };
     }
 
@@ -59,21 +58,22 @@ export default class LoginPage extends Component {
     RegisterFunc = async () => {
 
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
 
-        if (this.state.username == '' || this.state.id == '') {
+
+        if (this.state.username === '' || this.state.id === '') {
             alert("All the fields are compulsory!");
-        } 
-        else{
+        }
+        else {
             await this.state.contract.methods.registerStudents(
-                this.state.username,
+                this.state.maxCourseNumber,
                 this.state.id,
-                )
+                this.state.username
+            )
 
                 .send({
-                    from : this.state.account,
+                    from: this.state.account,
                 }).then(response => {
-                    this.props.history.push("/health");
+                    this.props.history.push("/Profile");
                 });
 
             //Reload
@@ -87,7 +87,7 @@ export default class LoginPage extends Component {
     updateId = event => (
         this.setState({ id: event.target.value })
     )
-    
+
 
     render() {
         if (this.state.student || this.state.studentResources) {
@@ -122,9 +122,9 @@ export default class LoginPage extends Component {
 
                             <div>
                                 <div>
-                                    <h1 style={{color:"black"}}>
+                                    <h1 style={{ color: "black" }}>
                                         Student Registration
-                  </h1>
+                                    </h1>
                                 </div>
                             </div>
 
@@ -133,7 +133,7 @@ export default class LoginPage extends Component {
                             <div className="form">
                                 <FormGroup>
                                     <div className="form-label">
-                                        Enter Username 
+                                        Enter Username
                                     </div>
                                     <div className="form-input">
                                         <FormControl

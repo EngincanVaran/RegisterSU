@@ -37,7 +37,7 @@ ReactDOM.render(
           <Route path="/RegisterStudent" component={RegisterStudent} />
           <Route path="/RegisterSR" component={RegisterSR} />
           <Route path="/health" component={HealthPage} />
-          <Route path="/profilecard" component={ProfilePage} />
+          <Route path="/Profile" component={ProfilePage} />
         </Switch>
       </Router>
     </BackgroundColorWrapper>
