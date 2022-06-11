@@ -13,7 +13,8 @@ import RegisterStudent from "./Pages/RegisterStudent";
 import RegisterSR from "./Pages/RegisterSr";
 import Landing from "./Pages/LandingPage";
 import ProfilePage from "./Pages/ProfilePage";
-
+import StudentRegistercoursePage from "./Pages/StudentRegistercourse";
+import InstructorAddCoursePage from './Pages/InstuctorAddCourse';
 import {
   BrowserRouter as Router,
   Route,
@@ -38,6 +39,8 @@ ReactDOM.render(
           <Route path="/RegisterSR" component={RegisterSR} />
           <Route path="/health" component={HealthPage} />
           <Route path="/Profile" component={ProfilePage} />
+          <Route path="/InstructorAddCourse" component={InstructorAddCoursePage} />
+          <Route path="/StudentRegistercourse" component={StudentRegistercoursePage} />
         </Switch>
       </Router>
     </BackgroundColorWrapper>
