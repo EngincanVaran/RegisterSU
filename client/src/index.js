@@ -6,7 +6,6 @@ import history from './history';
 import HealthPage from './Pages/HealthPage';
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
-import AddCourse from "./Pages/AddCourse3"
 import CloseCourse from "./Pages/CloseCourse";
 import RegisterCourse from "./Pages/RegisterCourse";
 import RegisterStudent from "./Pages/RegisterStudent";
@@ -32,7 +31,6 @@ ReactDOM.render(
       <Router history={history}>
         <Switch>
           <Route exact path='/' component={Landing} />
-          <Route path="/AddCourse" component={AddCourse} />
           <Route path="/CloseCourse" component={CloseCourse} />
           <Route path="/RegisterCourse" component={RegisterCourse} />
           <Route path="/RegisterStudent" component={RegisterStudent} />

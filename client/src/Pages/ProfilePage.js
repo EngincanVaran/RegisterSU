@@ -51,10 +51,12 @@ export default class ProfilePage extends Component {
         }
     };
 
+    NavigateAddCourse = async () => {
+        this.props.history.push("/StudentRegistercourse")
+    }
 
     render() {
         return (
-
             <>
                 <center><div class="title"><h1>Student Profile Page</h1></div></center>
                 <hr></hr>
@@ -79,10 +81,10 @@ export default class ProfilePage extends Component {
                         <div class="btn-1-c">
                         </div>
                         <div class="btn-2-c">
-                            <button type="button" class="btn btn-success">Add Class</button>
+                            <button type="button" class="btn btn-success" onClick={this.NavigateAddCourse}>Register Course</button>
                         </div>
                         <div class="btn-3-c">
-                            <button type="button" class="btn btn-success">Trade Class</button>
+                            <button type="button" class="btn btn-success">Trade Course</button>
                         </div>
                     </div>
 

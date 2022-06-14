@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import '../index.css';
 import { Button, CardTitle } from "reactstrap";
+import RegisterSU from "../contracts/RegisterSU.json";
+import getWeb3 from "../getWeb3";
 import {
     Card,
     CardHeader,
@@ -20,6 +22,83 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 export default class StudentRegistercoursePage extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentAccount: null,
+            web3: null,
+            accounts: null,
+            contract: null,
+            student: null,
+            studentName: '',
+            studentId: '',
+            courseCode: ''
+        };
+
+    }
+
+    componentDidMount = async () => {
+        try {
+            const web3 = await getWeb3();
+            const accounts = await web3.eth.getAccounts();
+            const networkId = await web3.eth.net.getId();
+            const deployedNetwork = RegisterSU.networks[networkId];
+            const instance = new web3.eth.Contract(
+                RegisterSU.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            this.setState({ contract: instance, web3: web3, account: accounts[0] });
+
+            const currentAccount = await web3.currentProvider.selectedAddress
+            console.log(currentAccount)
+            this.setState({ currentAccount: currentAccount });
+            const studentName = await this.state.contract.methods.getStudentName(this.state.currentAccount).call();
+            this.setState({ studentName: studentName })
+            const studentId = await this.state.contract.methods.getStudentId(this.state.currentAccount).call();
+            this.setState({ studentId: studentId })
+        } catch (error) {
+            alert(
+                `Failed to load web3, accounts, or contract. Check console for details.`,
+            );
+            console.error(error);
+        }
+        try {
+
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+
+    Register = async () => {
+
+        if (this.state.courseCode === '') {
+            alert("Enter a code!");
+        }
+        else {
+            let res = await this.state.contract.methods.registerToCourse(
+                [this.state.courseCode]               
+            )
+                .send({
+                    from: this.state.account,
+                }).then(response => {
+                    //this.props.history.push("/health");
+                    console.log(response)
+                    alert("You successfully registered");
+
+                });
+
+            //Reload
+            //window.location.reload(false);
+            console.log(res)
+        }
+    }
+
+    updateCode = event => (
+        this.setState({ courseCode: event.target.value })
+    )
+
+
     render() {  
         return(
     
@@ -32,7 +111,13 @@ export default class StudentRegistercoursePage extends Component {
                     
                     </div>
                     <div class="name-content">
-                        <p class="namec">Ali Arda Girgin (Student)</p>
+                        <p class="namec">Username: {this.state.studentName}</p>
+                    </div>
+                    <div class="name-content">
+                            <p class="namec">Number: {this.state.studentId}</p>
+                        </div>
+                    <div class="name-content-account">
+                        <p class="namec">Your Account: {this.state.currentAccount}</p>
                     </div>
                 </div>
             </div>
@@ -42,10 +127,10 @@ export default class StudentRegistercoursePage extends Component {
                     <div class="btn-1-c">
                     </div>
                     <div class="btn-2-c">
-                        <button type="button" class="btn btn-success">Add Class</button>
+                        <button type="button" class="btn btn-success">Register Course</button>
                     </div>
                     <div class="btn-3-c">
-                        <button type="button" class="btn btn-success">Trade Class</button>
+                        <button type="button" class="btn btn-success">Trade Course</button>
                     </div>
                 </div>
                 
@@ -60,16 +145,18 @@ export default class StudentRegistercoursePage extends Component {
                         <Form className="form">
                            
                             <FormGroup>
-                                <Label for="courseID">Course ID</Label>
+                                <Label for="courseID">Course Code</Label>
                                 <Input
                                 type="text"
                                 name="idCourse"
                                 id="courseID"
                                 placeholder="ID..."
+                                value={this.state.courseCode}
+                                onChange={this.updateCode}
                                 />
                             </FormGroup>
 
-                            <Button>Add Course</Button>
+                            <Button onClick={this.Register} >Register</Button>
                         </Form>
                     </Col>
                 </Row>
