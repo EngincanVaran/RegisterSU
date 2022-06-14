@@ -14,7 +14,7 @@ import {
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-
+var row = [];
 
 export default class ProfilePageSr extends Component {
 
@@ -56,6 +56,35 @@ export default class ProfilePageSr extends Component {
         } catch (error) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
+            );
+            console.error(error);
+        }
+        try {
+            var count = await this.state.contract.methods.getCoursesCount().call();
+            count = parseInt(count);
+            console.log(typeof (count));
+            console.log(count);
+
+            var rowsCode = [];
+            var rowsCapacity = [];
+            var rowsStatus = [];
+
+            for (var i = 0; i < count; i++) {
+                let code = await this.state.contract.methods.getCourseCode(i).call();
+                let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
+                let status = await this.state.contract.methods.getCourseStatus(i).call();
+                rowsCode.push(code);
+                rowsCapacity.push(capacity);
+                rowsStatus.push(status);
+            }
+            for (var i = 0; i < count; i++) {
+                row.push(<tr><td>{i + 1}</td><td>{rowsCode[i]}</td><td>{rowsCapacity[i]}</td><td>{rowsStatus[i]}</td></tr>)
+            }
+            console.log(row);
+
+        } catch (error) {
+            alert(
+                `Failed to fetch courseData.`,
             );
             console.error(error);
         }
@@ -163,6 +192,3 @@ export default class ProfilePageSr extends Component {
         );
     }
 }
-
-    //butondan add course yazınca contract gelmiyor
-    //register courseda input boş geliyor ganacheda

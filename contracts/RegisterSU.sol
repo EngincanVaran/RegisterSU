@@ -30,6 +30,7 @@ contract RegisterSU {
     }
 
     mapping(string => Courses) public courses;
+    mapping(uint256 => Courses) public courseList;
     mapping(address => Students) public StudentMapping;
     mapping(address => StudentResources) public StudentResourcesMapping;
     mapping(string => CourseRequest) public RequestsMapping;
@@ -123,9 +124,16 @@ contract RegisterSU {
             !isCourseAddedBefore(courseCode),
             "This course has already added to list."
         );
-        CourseMapping[courseCode] = true;
-        coursesCount++;
         address[] memory sCourses = new address[](maxStudentCount);
+        CourseMapping[courseCode] = true;
+        courseList[coursesCount] = Courses(
+            courseCode,
+            false,
+            maxStudentCount,
+            0,
+            sCourses
+        );
+        coursesCount++;
         courses[courseCode] = Courses(
             courseCode,
             false,
@@ -202,5 +210,17 @@ contract RegisterSU {
     function getStudentId(address _id) public view returns (string memory) {
         require(isStudent(_id));
         return StudentMapping[_id].studentId;
+    }
+
+    function getCourseCode(uint256 i) public view returns (string memory) {
+        return courseList[i].courseCode;
+    }
+
+    function getCourseCapacity(uint256 i) public view returns (uint256) {
+        return courseList[i].courseCapacity;
+    }
+
+    function getCourseStatus(uint256 i) public view returns (bool) {
+        return courseList[i].status;
     }
 }
