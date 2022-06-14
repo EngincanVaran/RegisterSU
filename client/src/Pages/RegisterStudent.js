@@ -6,7 +6,7 @@ import { FormGroup, FormControl, Button } from 'react-bootstrap'
 
 import '../index.css';
 
-export default class LoginPage extends Component {
+export default class RegisterStudentPage extends Component {
 
     constructor(props) {
         super(props);
@@ -73,7 +73,7 @@ export default class LoginPage extends Component {
                 .send({
                     from: this.state.account,
                 }).then(response => {
-                    this.props.history.push("/Profile");
+                    this.props.history.push("/profile");
                 });
 
             //Reload

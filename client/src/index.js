@@ -6,19 +6,18 @@ import history from './history';
 import HealthPage from './Pages/HealthPage';
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
-import CloseCourse from "./Pages/CloseCourse";
-import RegisterCourse from "./Pages/RegisterCourse";
-import RegisterStudent from "./Pages/RegisterStudent";
+import RegisterStudentPage from "./Pages/RegisterStudent";
 import RegisterSR from "./Pages/RegisterSr";
-import Landing from "./Pages/LandingPage";
+import LandingPage from "./Pages/LandingPage";
 import ProfilePage from "./Pages/ProfilePage";
-import StudentRegistercoursePage from "./Pages/StudentRegistercourse";
-import InstructorAddCoursePage from './Pages/InstuctorAddCourse';
+import StudentRegisterCoursePage from "./Pages/RegisterCourse";
 import {
   BrowserRouter as Router,
   Route,
   Switch
 } from "react-router-dom";
+import SrProfilePage from './Pages/ProfilePageSr';
+import ProfilePageSr from './Pages/ProfilePageSr';
 /*ReactDOM.render(<App />, document.getElementById('root'));*/
 
 // If you want your app to work offline and load faster, you can change
@@ -30,15 +29,16 @@ ReactDOM.render(
     <BackgroundColorWrapper>
       <Router history={history}>
         <Switch>
-          <Route exact path='/' component={Landing} />
-          <Route path="/CloseCourse" component={CloseCourse} />
-          <Route path="/RegisterCourse" component={RegisterCourse} />
-          <Route path="/RegisterStudent" component={RegisterStudent} />
-          <Route path="/RegisterSR" component={RegisterSR} />
+          <Route exact path='/' component={LandingPage} />
           <Route path="/health" component={HealthPage} />
-          <Route path="/Profile" component={ProfilePage} />
-          <Route path="/InstructorAddCourse" component={InstructorAddCoursePage} />
-          <Route path="/StudentRegistercourse" component={StudentRegistercoursePage} />
+          {/* Student Pages */}
+          <Route path="/register-student" component={RegisterStudentPage} />
+          <Route path="/profile" component={ProfilePage} />
+          <Route path="/register-course" component={StudentRegisterCoursePage} />
+          {/* Student Resources Pages */}
+          <Route path="/register-sr" component={RegisterSR} />
+          <Route path="/sr-profile" component={ProfilePageSr} />
+
         </Switch>
       </Router>
     </BackgroundColorWrapper>
