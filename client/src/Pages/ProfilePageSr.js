@@ -3,6 +3,7 @@ import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import { Button } from "reactstrap";
+import CourseTable from "../components/CourseTable"
 
 import {
     FormGroup,
@@ -11,10 +12,11 @@ import {
     Label,
     Row,
     Col,
+    Table,
+    Spinner
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-var row = [];
 
 export default class ProfilePageSr extends Component {
 
@@ -28,7 +30,8 @@ export default class ProfilePageSr extends Component {
             contract: null,
             student: null,
             courseCode: '',
-            courseCapacity: ''
+            courseCapacity: '',
+            body: []
         };
 
     }
@@ -65,22 +68,26 @@ export default class ProfilePageSr extends Component {
             console.log(typeof (count));
             console.log(count);
 
-            var rowsCode = [];
-            var rowsCapacity = [];
-            var rowsStatus = [];
+            let tempBody = []
 
             for (var i = 0; i < count; i++) {
                 let code = await this.state.contract.methods.getCourseCode(i).call();
                 let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
                 let status = await this.state.contract.methods.getCourseStatus(i).call();
-                rowsCode.push(code);
-                rowsCapacity.push(capacity);
-                rowsStatus.push(status);
+                if (status)
+                    status = "Open"
+                else
+                    status = "Closed"
+                let temp = {
+                    "indices": i + 1,
+                    "code": code,
+                    "capacity": capacity,
+                    "status": status
+                }
+                tempBody.push(temp)
             }
-            for (var i = 0; i < count; i++) {
-                row.push(<tr><td>{i + 1}</td><td>{rowsCode[i]}</td><td>{rowsCapacity[i]}</td><td>{rowsStatus[i]}</td></tr>)
-            }
-            console.log(row);
+            this.setState({ body: tempBody });
+            console.log(this.state.body);
 
         } catch (error) {
             alert(
@@ -122,7 +129,42 @@ export default class ProfilePageSr extends Component {
     )
 
     render() {
+        if (!this.state.web3) {
+            return (
+                <div>
+                    <div>
+                        <h1>
+                            <Spinner animation="border" variant="primary" />
+                        </h1>
+                    </div>
 
+                </div>
+            );
+        }
+        return (
+            <Table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Code</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.state.body.map(item => {
+                        return (
+                            <tr key={item.indices}>
+                                <td>{item.indices}</td>
+                                <td>{item.code}</td>
+                                <td>{item.capacity}</td>
+                                <td>{item.status}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </Table>
+        )
         return (
             <>
                 <center><div class="title"><h1>SR Add Course</h1></div></center>
