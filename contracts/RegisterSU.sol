@@ -223,4 +223,8 @@ contract RegisterSU {
     function getCourseStatus(uint256 i) public view returns (bool) {
         return courseList[i].status;
     }
+
+    function getCourseMaxCapacity(uint256 i) public view returns (uint256) {
+        return courseList[i].courseMaxCapacity;
+    }
 }

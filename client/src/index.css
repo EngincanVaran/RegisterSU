@@ -443,7 +443,6 @@ html,
 }
 
 .container-profile {
-  width: 80%;
   height: 160px;
   border: 2px solid #fff;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
@@ -456,7 +455,6 @@ html,
 }
 
 .container-profile-2 {
-  width: 80%;
   height: 80px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
   margin: 0 auto;
@@ -464,7 +462,6 @@ html,
 }
 
 .container-profile-3 {
-  width: 80%;
   height: auto;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
   margin: 0 auto;

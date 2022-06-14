@@ -11,6 +11,8 @@ import RegisterSR from "./Pages/RegisterSr";
 import LandingPage from "./Pages/LandingPage";
 import ProfilePage from "./Pages/ProfilePage";
 import StudentRegisterCoursePage from "./Pages/RegisterCourse";
+import AddCourseSRPage from "./Pages/AddCourseSr";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -38,7 +40,7 @@ ReactDOM.render(
           {/* Student Resources Pages */}
           <Route path="/register-sr" component={RegisterSR} />
           <Route path="/sr-profile" component={ProfilePageSr} />
-
+          <Route path="/sr-add-course" component={AddCourseSRPage} />
         </Switch>
       </Router>
     </BackgroundColorWrapper>
