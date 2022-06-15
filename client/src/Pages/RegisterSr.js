@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import RegisterSU from "../contracts/RegisterSU.json";
 //import { Button } from "reactstrap";
 import getWeb3 from "../getWeb3";
-import { FormGroup, FormControl, Button} from 'react-bootstrap'
+import { FormGroup, FormControl, Button } from 'react-bootstrap'
 
 import '../index.css';
 
@@ -15,8 +15,8 @@ export default class LoginPage extends Component {
             web3: null,
             accounts: null,
             contract: null,
-            sr_code:'asdfqwer',
-            sr_code_input:'',
+            sr_code: 'asdfqwer',
+            sr_code_input: '',
         };
     }
 
@@ -48,19 +48,19 @@ export default class LoginPage extends Component {
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        if (this.state.sr_code_input == '') {
+        if (this.state.sr_code_input === '') {
             alert("All the fields are compulsory!");
-        } 
-        else if (this.state.sr_code_input !=this.state.sr_code) {
+        }
+        else if (this.state.sr_code_input !== this.state.sr_code) {
             alert("Access denied! Your code is wrong!");
-        } 
-        
-        else{
+        }
+
+        else {
             await this.state.contract.methods.registerStudentResources()
                 .send({
-                    from : this.state.currentAccount,
+                    from: this.state.currentAccount,
                 }).then(response => {
-                    this.props.history.push("/health");
+                    this.props.history.push("/sr-profile");
                 });
 
             //Reload
@@ -76,7 +76,7 @@ export default class LoginPage extends Component {
         return (
             <div className="bodyC">
                 <div className="img-wrapper">
-                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">Register</div>
                     </div>
@@ -87,9 +87,9 @@ export default class LoginPage extends Component {
 
                             <div>
                                 <div>
-                                    <h1 style={{color:"black"}}>
+                                    <h1 style={{ color: "black" }}>
                                         SR Registration
-                  </h1>
+                                    </h1>
                                 </div>
                             </div>
 
@@ -98,7 +98,7 @@ export default class LoginPage extends Component {
                             <div className="form">
                                 <FormGroup>
                                     <div className="form-label">
-                                        Enter SR Code 
+                                        Enter SR Code
                                     </div>
                                     <div className="form-input">
                                         <FormControl

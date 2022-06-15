@@ -4,12 +4,12 @@ import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
     Table,
-    Spinner
+    Spinner,
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 
-export default class StudentRegisterCoursePage extends Component {
+export default class ProfilePageSr extends Component {
 
     constructor(props) {
         super(props);
@@ -19,14 +19,16 @@ export default class StudentRegisterCoursePage extends Component {
             accounts: null,
             contract: null,
             student: null,
-            studentName: '',
-            studentId: '',
             body: []
         };
 
     }
 
     componentDidMount = async () => {
+        await this.initWeb3();
+    };
+
+    initWeb3 = async () => {
         try {
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
@@ -42,30 +44,28 @@ export default class StudentRegisterCoursePage extends Component {
             console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
-            var student = await instance.methods.isStudent(currentAccount).call();
-            console.log(student);
-            if (!student) {
+            var studentResources = await instance.methods.isStudentResources(currentAccount).call();
+            console.log(studentResources);
+
+            if (!studentResources) {
                 this.props.history.push("/")
                 window.location.reload(false);
             }
 
-            const studentName = await this.state.contract.methods.getStudentName(this.state.currentAccount).call();
-            this.setState({ studentName: studentName })
-            const studentId = await this.state.contract.methods.getStudentId(this.state.currentAccount).call();
-            this.setState({ studentId: studentId })
         } catch (error) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
             );
             console.error(error);
         }
+
         try {
             var count = await this.state.contract.methods.getCoursesCount().call();
             count = parseInt(count);
             console.log("Course Count:" + count);
 
-            let tempBody = [];
-            let index = 1
+            let tempBody = []
+
             for (var i = 0; i < count; i++) {
                 let code = await this.state.contract.methods.getCourseCode(i).call();
                 let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
@@ -73,16 +73,24 @@ export default class StudentRegisterCoursePage extends Component {
                 let maxCapacity = await this.state.contract.methods.getCourseMaxCapacity(i).call();
                 let action = null
                 if (status) {
-                    let temp = {
-                        "indices": index,
-                        "code": code,
-                        "capacity": capacity,
-                        "maxCapacity": maxCapacity,
-                        "actionName": action
-                    }
-                    tempBody.push(temp);
-                    index += 1;
+                    status = "Open"
+                    action = "Close Course"
                 }
+
+                else {
+                    status = "Closed"
+                    action = "Open Course"
+                }
+
+                let temp = {
+                    "indices": i + 1,
+                    "code": code,
+                    "capacity": capacity,
+                    "maxCapacity": maxCapacity,
+                    "status": status,
+                    "actionName": action
+                }
+                tempBody.push(temp)
             }
             this.setState({ body: tempBody });
             // console.log(this.state.body);
@@ -93,24 +101,33 @@ export default class StudentRegisterCoursePage extends Component {
             );
             console.error(error);
         }
-    };
-
-
-    enrollToCourse = async (courseCode) => {
-        await this.state.contract.methods.registerToCourse(
-            courseCode
-        ).send({
-            from: this.state.account,
-        }).then(response => {
-            //this.props.history.push("/health");
-            console.log(response)
-            alert("You successfully registered");
-        });
-        window.location.reload(false);
     }
 
     nagivateToPage = async (path) => {
         this.props.history.push(path)
+        window.location.reload(false);
+    }
+
+    toggleCourseStatus = async (_code, _status) => {
+        // means course is closed, open it
+        let status = 1
+        let new_status = "Open"
+
+        // means course is open, close it
+        if (_status === "Open") {
+            status = 0
+            new_status = "Closed"
+        }
+
+        await this.state.contract.methods.changeCourseStatus(
+            status, _code
+        ).send({
+            from: this.state.account,
+        }).then(response => {
+            alert(_code + " status is changed from " + _status + " to " + new_status);
+        });
+
+        //Reload
         window.location.reload(false);
     }
 
@@ -137,10 +154,7 @@ export default class StudentRegisterCoursePage extends Component {
                             <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
-                            <p class="namec">Username: {this.state.studentName}</p>
-                        </div>
-                        <div class="name-content">
-                            <p class="namec">Number: {this.state.studentId}</p>
+                            <p class="namec">Student Resources</p>
                         </div>
                         <div class="name-content-account">
                             <p class="namec">Your Account: {this.state.currentAccount}</p>
@@ -149,15 +163,14 @@ export default class StudentRegisterCoursePage extends Component {
                 </div>
                 <div class="container-profile-2">
                     <div class="info-container">
-                        <p class="overview">Enroll Courses</p>
+                        <p class="overview">All Courses</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-success" onClick={() => this.nagivateToPage("/profile")}>My Courses</button>
+                            <button type="button" class="btn btn-primary" disabled>Get Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-warning" disabled>Enroll Course</button>
+                            <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/sr-add-course")} >Add Course</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/trade-course")}>Trade Course</button>
                         </div>
                     </div>
                 </div>
@@ -169,6 +182,7 @@ export default class StudentRegisterCoursePage extends Component {
                             <th>Code</th>
                             <th>Total Enrolled</th>
                             <th>Capacity</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -180,13 +194,14 @@ export default class StudentRegisterCoursePage extends Component {
                                     <td>{item.code}</td>
                                     <td>{item.capacity}</td>
                                     <td>{item.maxCapacity}</td>
+                                    <td>{item.status}</td>
                                     <td>
                                         <button
-                                            type="button"
-                                            class="btn btn-warning btn-sm"
-                                            onClick={() => this.enrollToCourse(item.code)}
+                                            class="btn btn-danger btn-sm"
+                                            type='button'
+                                            onClick={() => this.toggleCourseStatus(item.code, item.status)}
                                         >
-                                            Register
+                                            {item.actionName}
                                         </button>
                                     </td>
                                 </tr>
@@ -195,7 +210,6 @@ export default class StudentRegisterCoursePage extends Component {
                     </tbody>
                 </Table>
             </>
-
-        );
+        )
     }
 }

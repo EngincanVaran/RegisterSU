@@ -6,10 +6,8 @@ import {
     Table,
     Spinner
 } from "reactstrap";
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-
-export default class StudentRegisterCoursePage extends Component {
+export default class ProfilePage extends Component {
 
     constructor(props) {
         super(props);
@@ -21,9 +19,9 @@ export default class StudentRegisterCoursePage extends Component {
             student: null,
             studentName: '',
             studentId: '',
+            maxCourseNumber: 5,
             body: []
         };
-
     }
 
     componentDidMount = async () => {
@@ -60,60 +58,30 @@ export default class StudentRegisterCoursePage extends Component {
             console.error(error);
         }
         try {
-            var count = await this.state.contract.methods.getCoursesCount().call();
-            count = parseInt(count);
-            console.log("Course Count:" + count);
-
-            let tempBody = [];
-            let index = 1
-            for (var i = 0; i < count; i++) {
-                let code = await this.state.contract.methods.getCourseCode(i).call();
-                let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
-                let status = await this.state.contract.methods.getCourseStatus(i).call();
-                let maxCapacity = await this.state.contract.methods.getCourseMaxCapacity(i).call();
-                let action = null
-                if (status) {
-                    let temp = {
-                        "indices": index,
-                        "code": code,
-                        "capacity": capacity,
-                        "maxCapacity": maxCapacity,
-                        "actionName": action
+            await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
+                .then(response => {
+                    console.log(response)
+                    let tempBody = []
+                    for (let i = 0; i < response.length; i++) {
+                        tempBody.push(
+                            {
+                                "indices": i + 1,
+                                "code": response[i]
+                            }
+                        )
                     }
-                    tempBody.push(temp);
-                    index += 1;
-                }
-            }
-            this.setState({ body: tempBody });
-            // console.log(this.state.body);
+                    this.setState({ body: tempBody })
+                });
 
         } catch (error) {
-            alert(
-                `Failed to fetch courseData.`,
-            );
-            console.error(error);
+            console.log(error)
         }
     };
-
-
-    enrollToCourse = async (courseCode) => {
-        await this.state.contract.methods.registerToCourse(
-            courseCode
-        ).send({
-            from: this.state.account,
-        }).then(response => {
-            //this.props.history.push("/health");
-            console.log(response)
-            alert("You successfully registered");
-        });
-        window.location.reload(false);
-    }
 
     nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
-
 
     render() {
         if (!this.state.web3) {
@@ -149,27 +117,24 @@ export default class StudentRegisterCoursePage extends Component {
                 </div>
                 <div class="container-profile-2">
                     <div class="info-container">
-                        <p class="overview">Enroll Courses</p>
+                        <p class="overview"> My Courses</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-success" onClick={() => this.nagivateToPage("/profile")}>My Courses</button>
+                            <button type="button" class="btn btn-success" disabled>My Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-warning" disabled>Enroll Course</button>
+                            <button type="button" class="btn btn-warning" onClick={() => this.nagivateToPage("/register-course")}>Enroll Course</button>
                         </div>
                         <div class="btn-1-c">
                             <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/trade-course")}>Trade Course</button>
                         </div>
                     </div>
+
                 </div>
-                <br></br>
                 <Table>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Code</th>
-                            <th>Total Enrolled</th>
-                            <th>Capacity</th>
-                            <th>Action</th>
+                            <th>Course</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -178,24 +143,12 @@ export default class StudentRegisterCoursePage extends Component {
                                 <tr key={item.indices}>
                                     <td>{item.indices}</td>
                                     <td>{item.code}</td>
-                                    <td>{item.capacity}</td>
-                                    <td>{item.maxCapacity}</td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            class="btn btn-warning btn-sm"
-                                            onClick={() => this.enrollToCourse(item.code)}
-                                        >
-                                            Register
-                                        </button>
-                                    </td>
                                 </tr>
                             );
                         })}
                     </tbody>
                 </Table>
             </>
-
         );
     }
 }
