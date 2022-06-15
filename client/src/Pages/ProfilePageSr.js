@@ -104,8 +104,8 @@ export default class ProfilePageSr extends Component {
         }
     }
 
-    NavigateAddCourse = async () => {
-        this.props.history.push("/sr-add-course")
+    NavigateToPage = async (path) => {
+        this.props.history.push(path)
         window.location.reload(false);
     }
 
@@ -152,6 +152,7 @@ export default class ProfilePageSr extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
+                            <img src={require("../components/profile_page.jpg")} />
                         </div>
                         <div class="name-content">
                             <p class="namec">Student Resources</p>
@@ -163,15 +164,14 @@ export default class ProfilePageSr extends Component {
                 </div>
                 <div class="container-profile-2">
                     <div class="info-container">
-                        <p class="overwievc"> Profile Page</p>
+                        <p class="overview">All Courses</p>
                         <div class="btn-1-c">
+                            <button type="button" class="btn btn-primary" disabled>Get Courses</button>
                         </div>
-                        <div class="btn-2-c">
-                            <button type="button" class="btn btn-success" onClick={this.NavigateAddCourse} >Add Course</button>
+                        <div class="btn-1-c">
+                            <button type="button" class="btn btn-danger" onClick={() => this.NavigateToPage("/sr-add-course")} >Add Course</button>
                         </div>
-
-                        <div class="btn-3-c">
-                            <button type="button" class="btn btn-success">Get Courses</button>
+                        <div class="btn-1-c">
                         </div>
                     </div>
                 </div>
@@ -197,15 +197,13 @@ export default class ProfilePageSr extends Component {
                                     <td>{item.maxCapacity}</td>
                                     <td>{item.status}</td>
                                     <td>
-                                        <Button
-                                            className="btn-primary"
+                                        <button
+                                            class="btn btn-danger btn-sm"
                                             type='button'
-                                            variant='warning'
-                                            size='sm'
                                             onClick={() => this.ToggleCourseStatus(item.code, item.status)}
                                         >
                                             {item.actionName}
-                                        </Button>
+                                        </button>
                                     </td>
                                 </tr>
                             );

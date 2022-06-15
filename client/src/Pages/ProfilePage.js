@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
+import {
+    Table,
+    Spinner,
+    Button
+} from "reactstrap";
 
 export default class ProfilePage extends Component {
 
@@ -16,6 +21,7 @@ export default class ProfilePage extends Component {
             studentName: '',
             studentId: '',
             maxCourseNumber: 5,
+            body: []
         };
     }
 
@@ -34,6 +40,14 @@ export default class ProfilePage extends Component {
             const currentAccount = await web3.currentProvider.selectedAddress
             console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
+
+            var student = await instance.methods.isStudent(currentAccount).call();
+            console.log(student);
+            if (!student) {
+                this.props.history.push("/")
+                window.location.reload(false);
+            }
+
             const studentName = await this.state.contract.methods.getStudentName(this.state.currentAccount).call();
             this.setState({ studentName: studentName })
             const studentId = await this.state.contract.methods.getStudentId(this.state.currentAccount).call();
@@ -45,25 +59,51 @@ export default class ProfilePage extends Component {
             console.error(error);
         }
         try {
+            await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
+                .then(response => {
+                    console.log(response)
+                    let tempBody = []
+                    for (let i = 0; i < response.length; i++) {
+                        tempBody.push(
+                            {
+                                "indices": i + 1,
+                                "code": response[i]
+                            }
+                        )
+                    }
+                    this.setState({ body: tempBody })
+                });
 
         } catch (error) {
             console.log(error)
         }
     };
 
-    NavigateAddCourse = async () => {
-        this.props.history.push("/register-course")
+    NavigateToPage = async (path) => {
+        this.props.history.push(path)
         window.location.reload(false);
     }
 
     render() {
+        if (!this.state.web3) {
+            return (
+                <div>
+                    <div>
+                        <h1>
+                            <center><Spinner animation="border" variant="primary" /></center>
+                        </h1>
+                    </div>
+
+                </div>
+            );
+        }
         return (
             <>
-                <center><div class="title"><h1>Student Profile Page</h1></div></center>
                 <hr></hr>
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
+                            <img src={require("../components/profile_page.jpg")} />
                         </div>
                         <div class="name-content">
                             <p class="namec">Username: {this.state.studentName}</p>
@@ -78,34 +118,38 @@ export default class ProfilePage extends Component {
                 </div>
                 <div class="container-profile-2">
                     <div class="info-container">
-                        <p class="overwievc"> Overview</p>
+                        <p class="overview"> My Courses</p>
                         <div class="btn-1-c">
+                            <button type="button" class="btn btn-success" disabled>My Courses</button>
                         </div>
-                        <div class="btn-2-c">
-                            <button type="button" class="btn btn-success" onClick={this.NavigateAddCourse}>Register Course</button>
+                        <div class="btn-1-c">
+                            <button type="button" class="btn btn-warning" onClick={() => this.NavigateToPage("/register-course")}>Enroll Course</button>
                         </div>
-                        <div class="btn-3-c">
-                            <button type="button" class="btn btn-success">Trade Course</button>
+                        <div class="btn-1-c">
+                            <button type="button" class="btn btn-danger" onClick={() => this.NavigateToPage("/trade-course")}>Trade Course</button>
                         </div>
                     </div>
 
                 </div>
-                <div class="container-profile-3">
-
-                    <div class="lecture-card">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5zfbTKHAgCd2U1uRDLdflDpzyOnajKcLOwQ&usqp=CAU" alt="Avatar"></img>
-                        <div class="container">
-                            <p></p>
-                            <h3><b>CS210</b></h3>
-                            <p>Introduction to Data Science </p>
-                            <h4><b>Capacity of the course is: 250</b></h4>
-                        </div>
-                        <div class="closebutton"> <button type="button" class="btn-close" aria-label="Close"></button>  </div>
-                    </div>
-                </div>
-
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Course</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.body.map(item => {
+                            return (
+                                <tr key={item.indices}>
+                                    <td>{item.indices}</td>
+                                    <td>{item.code}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </Table>
             </>
-
         );
     }
 }

@@ -169,6 +169,7 @@ contract RegisterSU {
     }
 
     function registerToCourse(string memory _courseCode) public {
+        // check whether the student already registered or not!
         require(isStudent(msg.sender), "You are not a student!");
         require(isCourseAddedBefore(_courseCode), "There is no such course!");
         require(courses[_courseCode].status, "Course is not open");
@@ -234,5 +235,13 @@ contract RegisterSU {
 
     function getCourseMaxCapacity(uint256 i) public view returns (uint256) {
         return courseList[i].courseMaxCapacity;
+    }
+
+    function getStudentCourses(address _address)
+        public
+        view
+        returns (string[] memory)
+    {
+        return StudentMapping[_address].courses;
     }
 }

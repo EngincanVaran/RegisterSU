@@ -414,10 +414,10 @@ html,
 
 .avatar {
   display: flex;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: #b6afaf;
+  width: 150px;
+  height: 150px;
+  border-radius: 30%;
+  background-color: #ffffff;
   flex-shrink: 0;
 
 }
@@ -447,18 +447,21 @@ html,
   border: 2px solid #fff;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
   margin: 0 auto;
+  text-align: center;
 }
 
-.container-profile-2 .info-container .overwievc {
+.container-profile-2 .info-container .overview {
   margin-top: 1%;
   color: rgb(216, 208, 208);
+  text-align: center;
 }
 
 .container-profile-2 {
-  height: 80px;
+  height: 60px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
   margin: 0 auto;
   background-color: #666666;
+  align-items: center;
 }
 
 .container-profile-3 {

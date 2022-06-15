@@ -12,14 +12,15 @@ import LandingPage from "./Pages/LandingPage";
 import ProfilePage from "./Pages/ProfilePage";
 import StudentRegisterCoursePage from "./Pages/RegisterCourse";
 import AddCourseSRPage from "./Pages/AddCourseSr";
+import ProfilePageSr from './Pages/ProfilePageSr';
+import TradeCoursePage from './Pages/TradeCourse';
 
 import {
   BrowserRouter as Router,
   Route,
   Switch
 } from "react-router-dom";
-import SrProfilePage from './Pages/ProfilePageSr';
-import ProfilePageSr from './Pages/ProfilePageSr';
+
 /*ReactDOM.render(<App />, document.getElementById('root'));*/
 
 // If you want your app to work offline and load faster, you can change
@@ -37,6 +38,7 @@ ReactDOM.render(
           <Route path="/register-student" component={RegisterStudentPage} />
           <Route path="/profile" component={ProfilePage} />
           <Route path="/register-course" component={StudentRegisterCoursePage} />
+          <Route path="/trade-course" component={TradeCoursePage} />
           {/* Student Resources Pages */}
           <Route path="/register-sr" component={RegisterSR} />
           <Route path="/sr-profile" component={ProfilePageSr} />

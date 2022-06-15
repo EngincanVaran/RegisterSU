@@ -2,22 +2,13 @@ import React, { Component } from "react";
 import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
-import { Button } from "reactstrap";
-
 import {
-    FormGroup,
-    Form,
-    Input,
-    Label,
-    Row,
-    Col,
     Spinner
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 
-export default class ProfilePageSr extends Component {
-
+export default class TradeCoursePage extends Component {
 
     constructor(props) {
         super(props);
@@ -27,18 +18,14 @@ export default class ProfilePageSr extends Component {
             accounts: null,
             contract: null,
             student: null,
-            courseCode: '',
-            courseCapacity: '',
+            studentName: '',
+            studentId: '',
             body: []
         };
 
     }
 
     componentDidMount = async () => {
-        await this.initWeb3();
-    };
-
-    initWeb3 = async () => {
         try {
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
@@ -54,48 +41,84 @@ export default class ProfilePageSr extends Component {
             console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
-            var studentResources = await instance.methods.isStudentResources(currentAccount).call();
-            console.log(studentResources);
-
-            if (!studentResources) {
+            var student = await instance.methods.isStudent(currentAccount).call();
+            console.log(student);
+            if (!student) {
                 this.props.history.push("/")
                 window.location.reload(false);
             }
 
+            const studentName = await this.state.contract.methods.getStudentName(this.state.currentAccount).call();
+            this.setState({ studentName: studentName })
+            const studentId = await this.state.contract.methods.getStudentId(this.state.currentAccount).call();
+            this.setState({ studentId: studentId })
         } catch (error) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
             );
             console.error(error);
         }
-    }
+        try {
+            var count = await this.state.contract.methods.getCoursesCount().call();
+            count = parseInt(count);
+            console.log("Course Count:" + count);
 
-    AddCourse = async () => {
+            let tempBody = [];
+            let index = 1
+            for (var i = 0; i < count; i++) {
+                let code = await this.state.contract.methods.getCourseCode(i).call();
+                let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
+                let status = await this.state.contract.methods.getCourseStatus(i).call();
+                let maxCapacity = await this.state.contract.methods.getCourseMaxCapacity(i).call();
+                let action = null
+                if (status) {
+                    let temp = {
+                        "indices": index,
+                        "code": code,
+                        "capacity": capacity,
+                        "maxCapacity": maxCapacity,
+                        "actionName": action
+                    }
+                    tempBody.push(temp);
+                    index += 1;
+                }
+            }
+            this.setState({ body: tempBody });
 
-        if (this.state.courseCode === '' || this.state.courseCapacity === '') {
-            alert("All the fields are compulsory!");
+        } catch (error) {
+            alert(
+                `Failed to fetch courseData.`,
+            );
+            console.error(error);
+        }
+    };
+
+
+    Register = async () => {
+
+        if (this.state.courseCode === '') {
+            alert("Enter a code!");
         }
         else {
-            await this.state.contract.methods.addCourse(
-                this.state.courseCapacity,
+            let res = await this.state.contract.methods.registerToCourse(
                 this.state.courseCode
             ).send({
                 from: this.state.account,
             }).then(response => {
-                console.log(response.events.AddingCourse.returnValues)
-                alert("You successfully added a course");
+                //this.props.history.push("/health");
+                console.log(response)
+                alert("You successfully registered");
+
             });
 
             //Reload
             //window.location.reload(false);
+            console.log(res)
         }
     }
 
     updateCode = event => (
         this.setState({ courseCode: event.target.value })
-    )
-    updateCapacity = event => (
-        this.setState({ courseCapacity: event.target.value })
     )
 
     NavigateToPage = async (path) => {
@@ -116,7 +139,6 @@ export default class ProfilePageSr extends Component {
                 </div>
             );
         }
-
         return (
             <>
                 <hr></hr>
@@ -126,7 +148,10 @@ export default class ProfilePageSr extends Component {
                             <img src={require("../components/profile_page.jpg")} />
                         </div>
                         <div class="name-content">
-                            <p class="namec">Student Resources</p>
+                            <p class="namec">Username: {this.state.studentName}</p>
+                        </div>
+                        <div class="name-content">
+                            <p class="namec">Number: {this.state.studentId}</p>
                         </div>
                         <div class="name-content-account">
                             <p class="namec">Your Account: {this.state.currentAccount}</p>
@@ -135,52 +160,20 @@ export default class ProfilePageSr extends Component {
                 </div>
                 <div class="container-profile-2">
                     <div class="info-container">
-                        <p class="overview"> Adding Course</p>
+                        <p class="overview">Trade Course</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-primary" onClick={() => this.NavigateToPage("/sr-profile")}>Get Courses</button>
+                            <button type="button" class="btn btn-success" onClick={() => this.NavigateToPage("/profile")}>My Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-danger" disabled>Add Course</button>
-                        </div>
+                            <button type="button" class="btn btn-warning" onClick={() => this.NavigateToPage("/register-course")}>Enroll Course</button>
+                        </div >
                         <div class="btn-1-c">
+                            <button type="button" class="btn btn-danger" disabled >Trade Course</button>
                         </div>
-                    </div>
-
-                </div>
-                <div class="container-profile-3">
-                    <Row className="justify-content-center mx-auto">
-                        <Col className="col-md-6 mt-5 mb-5" >
-                            <h2>Add Course to System</h2>
-                            <Form className="form">
-                                <FormGroup>
-                                    <Label for="courseCode">Course Code</Label>
-                                    <Input
-                                        type="text"
-                                        name="codeCourse"
-                                        id="courseCode"
-                                        placeholder="Code..."
-                                        value={this.state.courseCode}
-                                        onChange={this.updateCode}
-                                    />
-                                </FormGroup>
-
-                                <FormGroup>
-                                    <Label for="courseCapacity">Course Capacity</Label>
-                                    <Input
-                                        type="text"
-                                        name="capCourse"
-                                        id="courseCapacity"
-                                        placeholder="Capacity..."
-                                        value={this.state.courseCapacity}
-                                        onChange={this.updateCapacity}
-                                    />
-                                </FormGroup>
-                                <Button onClick={this.AddCourse} >Add Course</Button>
-                            </Form>
-                        </Col>
-                    </Row>
-                </div>
-
+                    </div >
+                </div >
+                <br></br>
+                <h1>Trade Course</h1>
             </>
 
         );
