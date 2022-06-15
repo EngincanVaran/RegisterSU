@@ -3,9 +3,11 @@ import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
-    Spinner
+    Spinner,
 } from "reactstrap";
+import { FormGroup, FormControl, Button } from 'react-bootstrap'
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
 
 
 export default class TradeCoursePage extends Component {
@@ -20,6 +22,10 @@ export default class TradeCoursePage extends Component {
             student: null,
             studentName: '',
             studentId: '',
+            acc1: '',
+            acc2: '',
+            course1: '',
+            course2: '',
             body: []
         };
 
@@ -112,7 +118,63 @@ export default class TradeCoursePage extends Component {
                     </div >
                 </div >
                 <br></br>
-                <h1>Trade Course</h1>
+                <div className="form">
+                                <FormGroup>
+                                    <div className="form-label">
+                                        Enter Your Address
+                                    </div>
+                                    <div className="form-input">
+                                        <FormControl
+                                            input='text'
+                                            //value={this.state.acc1}
+                                           // onChange={this.acc1}
+                                        />
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <div className="form-label">
+                                        Enter Trader's Address
+                                    </div>
+                                    <div className="form-input">
+                                        <FormControl
+                                            input='text'
+                                            //value={this.state.acc2}
+                                            //onChange={this.acc2}
+                                        />
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <div className="form-label">
+                                        Enter Course Code to send
+                                    </div>
+                                    <div className="form-input">
+                                        <FormControl
+                                            input='text'
+                                            //value={this.state.course1}
+                                            //onChange={this.course1}
+                                        />
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <div className="form-label">
+                                        Enter Course Code to receive
+                                    </div>
+                                    <div className="form-input">
+                                        <FormControl
+                                            input='text'
+                                            //value={this.state.course2}
+                                            //onChange={this.course2}
+                                        />
+                                    </div>
+                                </FormGroup>
+                                <br></br>
+                                <button type="button" class="btn btn-warning">Trade</button>
+
+                                
+                                </div >
             </>
 
         );
