@@ -5,7 +5,6 @@ import getWeb3 from "../getWeb3";
 import {
     Table,
     Spinner,
-    Button
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
@@ -104,12 +103,12 @@ export default class ProfilePageSr extends Component {
         }
     }
 
-    NavigateToPage = async (path) => {
+    nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
 
-    ToggleCourseStatus = async (_code, _status) => {
+    toggleCourseStatus = async (_code, _status) => {
         // means course is closed, open it
         let status = 1
         let new_status = "Open"
@@ -152,7 +151,7 @@ export default class ProfilePageSr extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
-                            <img src={require("../components/profile_page.jpg")} />
+                            <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
                             <p class="namec">Student Resources</p>
@@ -169,7 +168,7 @@ export default class ProfilePageSr extends Component {
                             <button type="button" class="btn btn-primary" disabled>Get Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-danger" onClick={() => this.NavigateToPage("/sr-add-course")} >Add Course</button>
+                            <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/sr-add-course")} >Add Course</button>
                         </div>
                         <div class="btn-1-c">
                         </div>
@@ -200,7 +199,7 @@ export default class ProfilePageSr extends Component {
                                         <button
                                             class="btn btn-danger btn-sm"
                                             type='button'
-                                            onClick={() => this.ToggleCourseStatus(item.code, item.status)}
+                                            onClick={() => this.toggleCourseStatus(item.code, item.status)}
                                         >
                                             {item.actionName}
                                         </button>

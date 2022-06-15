@@ -4,8 +4,7 @@ import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
     Table,
-    Spinner,
-    Button
+    Spinner
 } from "reactstrap";
 
 export default class ProfilePage extends Component {
@@ -79,7 +78,7 @@ export default class ProfilePage extends Component {
         }
     };
 
-    NavigateToPage = async (path) => {
+    nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
@@ -103,7 +102,7 @@ export default class ProfilePage extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
-                            <img src={require("../components/profile_page.jpg")} />
+                            <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
                             <p class="namec">Username: {this.state.studentName}</p>
@@ -123,10 +122,10 @@ export default class ProfilePage extends Component {
                             <button type="button" class="btn btn-success" disabled>My Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-warning" onClick={() => this.NavigateToPage("/register-course")}>Enroll Course</button>
+                            <button type="button" class="btn btn-warning" onClick={() => this.nagivateToPage("/register-course")}>Enroll Course</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-danger" onClick={() => this.NavigateToPage("/trade-course")}>Trade Course</button>
+                            <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/trade-course")}>Trade Course</button>
                         </div>
                     </div>
 

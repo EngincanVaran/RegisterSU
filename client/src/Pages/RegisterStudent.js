@@ -94,7 +94,7 @@ export default class RegisterStudentPage extends Component {
             return (
                 <div className="bodyC">
                     <div className="img-wrapper">
-                        <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                        <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" alt="Logo" />
                         <div className="wine-text-container">
                             <div className="site-title wood-text">Register SU</div>
                         </div>
@@ -111,7 +111,7 @@ export default class RegisterStudentPage extends Component {
         return (
             <div className="bodyC">
                 <div className="img-wrapper">
-                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">Register</div>
                     </div>

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import RegisterSU from "../contracts/RegisterSU.json";
-//import { Button } from "reactstrap";
 import getWeb3 from "../getWeb3";
 import { Button } from 'react-bootstrap'
 
@@ -70,7 +69,8 @@ export default class LoginPage extends Component {
             return (
                 <div className="bodyC">
                     <div className="img-wrapper">
-                        <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                        {/* Change Background Image */}
+                        <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                         <div className="wine-text-container">
                             <div className="site-title wood-text">Register SU</div>
                         </div>
@@ -88,7 +88,7 @@ export default class LoginPage extends Component {
             return (
                 <div className="bodyC">
                     <div className="img-wrapper">
-                        <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                        <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                         <div className="wine-text-container">
                             <div className="site-title wood-text">Register SU</div>
                         </div>
@@ -108,7 +108,7 @@ export default class LoginPage extends Component {
                     <h3 style={{ color: "wheat" }}>Help?</h3>
                 </a>
                 <div className="img-wrapper">
-                    <img src="https://upload.wikimedia.org/wikipedia/tr/d/d3/Sabanc%C4%B1_%C3%9Cniversitesi_logosu.jpg" className="logo" />
+                    <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">RegisterSU</div>
                     </div>

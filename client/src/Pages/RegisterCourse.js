@@ -96,7 +96,7 @@ export default class StudentRegisterCoursePage extends Component {
     };
 
 
-    Register = async (courseCode) => {
+    enrollToCourse = async (courseCode) => {
         await this.state.contract.methods.registerToCourse(
             courseCode
         ).send({
@@ -109,7 +109,7 @@ export default class StudentRegisterCoursePage extends Component {
         window.location.reload(false);
     }
 
-    NavigateToPage = async (path) => {
+    nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
@@ -134,7 +134,7 @@ export default class StudentRegisterCoursePage extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
-                            <img src={require("../components/profile_page.jpg")} />
+                            <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
                             <p class="namec">Username: {this.state.studentName}</p>
@@ -151,13 +151,13 @@ export default class StudentRegisterCoursePage extends Component {
                     <div class="info-container">
                         <p class="overview">Enroll Courses</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-success" onClick={() => this.NavigateToPage("/profile")}>My Courses</button>
+                            <button type="button" class="btn btn-success" onClick={() => this.nagivateToPage("/profile")}>My Courses</button>
                         </div>
                         <div class="btn-1-c">
                             <button type="button" class="btn btn-warning" disabled>Enroll Course</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-danger" onClick={() => this.NavigateToPage("/trade-course")}>Trade Course</button>
+                            <button type="button" class="btn btn-danger" onClick={() => this.nagivateToPage("/trade-course")}>Trade Course</button>
                         </div>
                     </div>
                 </div>
@@ -184,7 +184,7 @@ export default class StudentRegisterCoursePage extends Component {
                                         <button
                                             type="button"
                                             class="btn btn-warning btn-sm"
-                                            onClick={() => this.Register(item.code)}
+                                            onClick={() => this.enrollToCourse(item.code)}
                                         >
                                             Register
                                         </button>

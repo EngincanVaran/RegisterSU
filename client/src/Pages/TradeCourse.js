@@ -58,70 +58,9 @@ export default class TradeCoursePage extends Component {
             );
             console.error(error);
         }
-        try {
-            var count = await this.state.contract.methods.getCoursesCount().call();
-            count = parseInt(count);
-            console.log("Course Count:" + count);
-
-            let tempBody = [];
-            let index = 1
-            for (var i = 0; i < count; i++) {
-                let code = await this.state.contract.methods.getCourseCode(i).call();
-                let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
-                let status = await this.state.contract.methods.getCourseStatus(i).call();
-                let maxCapacity = await this.state.contract.methods.getCourseMaxCapacity(i).call();
-                let action = null
-                if (status) {
-                    let temp = {
-                        "indices": index,
-                        "code": code,
-                        "capacity": capacity,
-                        "maxCapacity": maxCapacity,
-                        "actionName": action
-                    }
-                    tempBody.push(temp);
-                    index += 1;
-                }
-            }
-            this.setState({ body: tempBody });
-
-        } catch (error) {
-            alert(
-                `Failed to fetch courseData.`,
-            );
-            console.error(error);
-        }
     };
 
-
-    Register = async () => {
-
-        if (this.state.courseCode === '') {
-            alert("Enter a code!");
-        }
-        else {
-            let res = await this.state.contract.methods.registerToCourse(
-                this.state.courseCode
-            ).send({
-                from: this.state.account,
-            }).then(response => {
-                //this.props.history.push("/health");
-                console.log(response)
-                alert("You successfully registered");
-
-            });
-
-            //Reload
-            //window.location.reload(false);
-            console.log(res)
-        }
-    }
-
-    updateCode = event => (
-        this.setState({ courseCode: event.target.value })
-    )
-
-    NavigateToPage = async (path) => {
+    nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
@@ -145,7 +84,7 @@ export default class TradeCoursePage extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
-                            <img src={require("../components/profile_page.jpg")} />
+                            <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
                             <p class="namec">Username: {this.state.studentName}</p>
@@ -162,10 +101,10 @@ export default class TradeCoursePage extends Component {
                     <div class="info-container">
                         <p class="overview">Trade Course</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-success" onClick={() => this.NavigateToPage("/profile")}>My Courses</button>
+                            <button type="button" class="btn btn-success" onClick={() => this.nagivateToPage("/profile")}>My Courses</button>
                         </div>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-warning" onClick={() => this.NavigateToPage("/register-course")}>Enroll Course</button>
+                            <button type="button" class="btn btn-warning" onClick={() => this.nagivateToPage("/register-course")}>Enroll Course</button>
                         </div >
                         <div class="btn-1-c">
                             <button type="button" class="btn btn-danger" disabled >Trade Course</button>

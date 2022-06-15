@@ -70,7 +70,7 @@ export default class ProfilePageSr extends Component {
         }
     }
 
-    AddCourse = async () => {
+    addCourseToSystem = async () => {
 
         if (this.state.courseCode === '' || this.state.courseCapacity === '') {
             alert("All the fields are compulsory!");
@@ -98,7 +98,7 @@ export default class ProfilePageSr extends Component {
         this.setState({ courseCapacity: event.target.value })
     )
 
-    NavigateToPage = async (path) => {
+    nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
     }
@@ -123,7 +123,7 @@ export default class ProfilePageSr extends Component {
                 <div class="container-profile">
                     <div class="info-container">
                         <div class="avatar">
-                            <img src={require("../components/profile_page.jpg")} />
+                            <img src={require("../components/profile_page.jpg")} alt="Profile" />
                         </div>
                         <div class="name-content">
                             <p class="namec">Student Resources</p>
@@ -137,7 +137,7 @@ export default class ProfilePageSr extends Component {
                     <div class="info-container">
                         <p class="overview"> Adding Course</p>
                         <div class="btn-1-c">
-                            <button type="button" class="btn btn-primary" onClick={() => this.NavigateToPage("/sr-profile")}>Get Courses</button>
+                            <button type="button" class="btn btn-primary" onClick={() => this.nagivateToPage("/sr-profile")}>Get Courses</button>
                         </div>
                         <div class="btn-1-c">
                             <button type="button" class="btn btn-danger" disabled>Add Course</button>
@@ -175,7 +175,7 @@ export default class ProfilePageSr extends Component {
                                         onChange={this.updateCapacity}
                                     />
                                 </FormGroup>
-                                <Button onClick={this.AddCourse} >Add Course</Button>
+                                <Button onClick={this.addCourseToSystem} >Add Course</Button>
                             </Form>
                         </Col>
                     </Row>
