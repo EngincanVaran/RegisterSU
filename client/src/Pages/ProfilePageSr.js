@@ -2,17 +2,10 @@ import React, { Component } from "react";
 import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
-import { Button } from "reactstrap";
-
 import {
-    FormGroup,
-    Form,
-    Input,
-    Label,
-    Row,
-    Col,
     Table,
-    Spinner
+    Spinner,
+    Button
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
@@ -60,12 +53,11 @@ export default class ProfilePageSr extends Component {
             );
             console.error(error);
         }
-        
+
         try {
             var count = await this.state.contract.methods.getCoursesCount().call();
             count = parseInt(count);
-            console.log(typeof (count));
-            console.log(count);
+            console.log("Course Count:" + count);
 
             let tempBody = []
 
@@ -74,21 +66,29 @@ export default class ProfilePageSr extends Component {
                 let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
                 let status = await this.state.contract.methods.getCourseStatus(i).call();
                 let maxCapacity = await this.state.contract.methods.getCourseMaxCapacity(i).call();
-                if (status)
+                let action = null
+                if (status) {
                     status = "Open"
-                else
+                    action = "Close Course"
+                }
+
+                else {
                     status = "Closed"
+                    action = "Open Course"
+                }
+
                 let temp = {
                     "indices": i + 1,
                     "code": code,
                     "capacity": capacity,
                     "maxCapacity": maxCapacity,
-                    "status": status
+                    "status": status,
+                    "actionName": action
                 }
                 tempBody.push(temp)
             }
             this.setState({ body: tempBody });
-            console.log(this.state.body);
+            // console.log(this.state.body);
 
         } catch (error) {
             alert(
@@ -98,19 +98,42 @@ export default class ProfilePageSr extends Component {
         }
     }
 
-    NavigateAddCourse = async () =>{
+    NavigateAddCourse = async () => {
         this.props.history.push("/sr-add-course")
         window.location.reload(false);
     }
 
-    
+    ToggleCourseStatus = async (_code, _status) => {
+        // means course is closed, open it
+        let status = 1
+        let new_status = "Open"
+
+        // means course is open, close it
+        if (_status === "Open") {
+            status = 0
+            new_status = "Closed"
+        }
+
+        await this.state.contract.methods.changeCourseStatus(
+            status, _code
+        ).send({
+            from: this.state.account,
+        }).then(response => {
+            alert(_code + " status is changed from " + _status + " to " + new_status);
+        });
+
+        //Reload
+        window.location.reload(false);
+    }
+
+
     render() {
         if (!this.state.web3) {
             return (
                 <div>
                     <div>
                         <h1>
-                            <Spinner animation="border" variant="primary" />
+                            <center><Spinner animation="border" variant="primary" /></center>
                         </h1>
                     </div>
 
@@ -145,34 +168,45 @@ export default class ProfilePageSr extends Component {
                             <button type="button" class="btn btn-success">Get Courses</button>
                         </div>
                     </div>
-
                 </div>
-            <br></br>
-            <Table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Code</th>
-                        <th>Total Enrolled</th>
-                        <th>Capacity</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.state.body.map(item => {
-                        return (
-                            <tr key={item.indices}>
-                                <td>{item.indices}</td>
-                                <td>{item.code}</td>
-                                <td>{item.capacity}</td>
-                                <td>{item.maxCapacity}</td>
-                                <td>{item.status}</td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </Table>
+                <br></br>
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Total Enrolled</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.body.map(item => {
+                            return (
+                                <tr key={item.indices}>
+                                    <td>{item.indices}</td>
+                                    <td>{item.code}</td>
+                                    <td>{item.capacity}</td>
+                                    <td>{item.maxCapacity}</td>
+                                    <td>{item.status}</td>
+                                    <td>
+                                        <Button
+                                            className="btn-primary"
+                                            type='button'
+                                            variant='warning'
+                                            size='sm'
+                                            onClick={() => this.ToggleCourseStatus(item.code, item.status)}
+                                        >
+                                            {item.actionName}
+                                        </Button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </Table>
             </>
-            )
+        )
     }
 }

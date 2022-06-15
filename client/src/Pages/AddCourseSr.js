@@ -62,39 +62,6 @@ export default class ProfilePageSr extends Component {
             );
             console.error(error);
         }
-        try {
-            var count = await this.state.contract.methods.getCoursesCount().call();
-            count = parseInt(count);
-            console.log(typeof (count));
-            console.log(count);
-
-            let tempBody = []
-
-            for (var i = 0; i < count; i++) {
-                let code = await this.state.contract.methods.getCourseCode(i).call();
-                let capacity = await this.state.contract.methods.getCourseCapacity(i).call();
-                let status = await this.state.contract.methods.getCourseStatus(i).call();
-                if (status)
-                    status = "Open"
-                else
-                    status = "Closed"
-                let temp = {
-                    "indices": i + 1,
-                    "code": code,
-                    "capacity": capacity,
-                    "status": status
-                }
-                tempBody.push(temp)
-            }
-            this.setState({ body: tempBody });
-            console.log(this.state.body);
-
-        } catch (error) {
-            alert(
-                `Failed to fetch courseData.`,
-            );
-            console.error(error);
-        }
     }
 
     AddCourse = async () => {
@@ -106,15 +73,12 @@ export default class ProfilePageSr extends Component {
             await this.state.contract.methods.addCourse(
                 this.state.courseCapacity,
                 this.state.courseCode
-            )
-
-                .send({
-                    from: this.state.account,
-                }).then(response => {
-                    //this.props.history.push("/health");
-                    console.log(response.events.AddingCourse.returnValues)
-                    alert("You successfully added a course");
-                });
+            ).send({
+                from: this.state.account,
+            }).then(response => {
+                console.log(response.events.AddingCourse.returnValues)
+                alert("You successfully added a course");
+            });
 
             //Reload
             //window.location.reload(false);
@@ -139,14 +103,14 @@ export default class ProfilePageSr extends Component {
                 <div>
                     <div>
                         <h1>
-                            <Spinner animation="border" variant="primary" />
+                            <center><Spinner animation="border" variant="primary" /></center>
                         </h1>
                     </div>
 
                 </div>
             );
         }
-        
+
         return (
             <>
                 <hr></hr>

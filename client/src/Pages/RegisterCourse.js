@@ -4,18 +4,12 @@ import { Button, CardTitle } from "reactstrap";
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
-    Card,
-    CardHeader,
-    CardBody,
-    CardFooter,
-    CardText,
     FormGroup,
     Form,
     Input,
     Label,
     Row,
-    Col,
-    CardSubtitle
+    Col
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
@@ -74,7 +68,7 @@ export default class StudentRegisterCoursePage extends Component {
         }
         else {
             let res = await this.state.contract.methods.registerToCourse(
-                [this.state.courseCode]
+                this.state.courseCode
             )
                 .send({
                     from: this.state.account,
