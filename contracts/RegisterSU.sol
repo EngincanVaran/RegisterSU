@@ -9,6 +9,7 @@ contract RegisterSU {
         uint256 courseMaxCapacity;
         uint256 courseCapacity;
         address[] students;
+        uint256 index;
     }
 
     struct Students {
@@ -30,6 +31,7 @@ contract RegisterSU {
     }
 
     mapping(string => Courses) public courses;
+    mapping(uint256 => Courses) public courseList;
     mapping(address => Students) public StudentMapping;
     mapping(address => StudentResources) public StudentResourcesMapping;
     mapping(string => CourseRequest) public RequestsMapping;
@@ -50,6 +52,7 @@ contract RegisterSU {
     event Registration(address _registrationId);
     event AddingCourse(string _courseCode);
     event Courserequested(address _studentId);
+    event Enrolled();
 
     constructor() public payable {}
 
@@ -123,16 +126,25 @@ contract RegisterSU {
             !isCourseAddedBefore(courseCode),
             "This course has already added to list."
         );
-        CourseMapping[courseCode] = true;
-        coursesCount++;
         address[] memory sCourses = new address[](maxStudentCount);
+        CourseMapping[courseCode] = true;
+        courseList[coursesCount] = Courses(
+            courseCode,
+            false,
+            maxStudentCount,
+            0,
+            sCourses,
+            coursesCount
+        );
         courses[courseCode] = Courses(
             courseCode,
             false,
             maxStudentCount,
             0,
-            sCourses
+            sCourses,
+            coursesCount
         );
+        coursesCount++;
 
         emit AddingCourse(courseCode);
     }
@@ -140,7 +152,10 @@ contract RegisterSU {
     function changeCourseStatus(uint256 status, string memory courseCode)
         public
     {
-        require(isStudentResources(msg.sender));
+        require(
+            isStudentResources(msg.sender),
+            "You are not the student resources!"
+        );
         require(
             isCourseAddedBefore(courseCode),
             "This course hasn't been added to the course list yet."
@@ -150,23 +165,24 @@ contract RegisterSU {
             courseStatus = true;
         }
         courses[courseCode].status = courseStatus;
+        courseList[courses[courseCode].index].status = courseStatus;
     }
 
-    function registerToCourse(string[] memory courseCodes)
-        public
-        returns (string[] memory)
-    {
-        require(isStudent(msg.sender));
+    function registerToCourse(string memory _courseCode) public {
+        require(isStudent(msg.sender), "You are not a student!");
+        require(isCourseAddedBefore(_courseCode), "There is no such course!");
+        require(courses[_courseCode].status, "Course is not open");
+        require(
+            courses[_courseCode].courseCapacity <
+                courses[_courseCode].courseMaxCapacity,
+            "Course capacity is full!"
+        );
 
-        // string[] memory studentCourses = courseCodes;
+        StudentMapping[msg.sender].courses.push(_courseCode);
+        courses[_courseCode].courseCapacity += 1;
+        courseList[courses[_courseCode].index].courseCapacity += 1;
 
-        for (uint256 i = 0; i < courseCodes.length; i++) {
-            StudentMapping[msg.sender].courses.push(courseCodes[i]);
-        }
-
-        return StudentMapping[msg.sender].courses;
-        //sCourses.push(msg.sender);
-        //courses[courseCode].students =  courses[courseCode].students.add(sCourses);
+        emit Enrolled();
     }
 
     function isStudentResources(address _id) public view returns (bool) {
@@ -202,5 +218,21 @@ contract RegisterSU {
     function getStudentId(address _id) public view returns (string memory) {
         require(isStudent(_id));
         return StudentMapping[_id].studentId;
+    }
+
+    function getCourseCode(uint256 i) public view returns (string memory) {
+        return courseList[i].courseCode;
+    }
+
+    function getCourseCapacity(uint256 i) public view returns (uint256) {
+        return courseList[i].courseCapacity;
+    }
+
+    function getCourseStatus(uint256 i) public view returns (bool) {
+        return courseList[i].status;
+    }
+
+    function getCourseMaxCapacity(uint256 i) public view returns (uint256) {
+        return courseList[i].courseMaxCapacity;
     }
 }

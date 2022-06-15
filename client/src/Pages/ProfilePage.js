@@ -52,7 +52,8 @@ export default class ProfilePage extends Component {
     };
 
     NavigateAddCourse = async () => {
-        this.props.history.push("/StudentRegistercourse")
+        this.props.history.push("/register-course")
+        window.location.reload(false);
     }
 
     render() {

@@ -60,7 +60,7 @@ export default class LoginPage extends Component {
                 .send({
                     from: this.state.currentAccount,
                 }).then(response => {
-                    this.props.history.push("/health");
+                    this.props.history.push("/sr-profile");
                 });
 
             //Reload
