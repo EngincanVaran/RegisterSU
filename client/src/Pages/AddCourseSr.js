@@ -3,7 +3,6 @@ import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import { Button } from "reactstrap";
-import CourseTable from "../components/CourseTable"
 
 import {
     FormGroup,
@@ -12,7 +11,6 @@ import {
     Label,
     Row,
     Col,
-    Table,
     Spinner
 } from "reactstrap";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
@@ -55,6 +53,14 @@ export default class ProfilePageSr extends Component {
             const currentAccount = await web3.currentProvider.selectedAddress
             console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
+
+            var studentResources = await instance.methods.isStudentResources(currentAccount).call();
+            console.log(studentResources);
+
+            if (!studentResources) {
+                this.props.history.push("/")
+                window.location.reload(false);
+            }
 
         } catch (error) {
             alert(

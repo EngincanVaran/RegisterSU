@@ -12,7 +12,6 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 export default class ProfilePageSr extends Component {
 
-
     constructor(props) {
         super(props);
         this.state = {
@@ -46,6 +45,13 @@ export default class ProfilePageSr extends Component {
             console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
+            var studentResources = await instance.methods.isStudentResources(currentAccount).call();
+            console.log(studentResources);
+
+            if (!studentResources) {
+                this.props.history.push("/")
+                window.location.reload(false);
+            }
 
         } catch (error) {
             alert(
