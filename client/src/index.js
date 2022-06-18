@@ -6,18 +6,21 @@ import history from './history';
 import HealthPage from './Pages/HealthPage';
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
-import AddCourse from "./Pages/AddCourse3"
-import CloseCourse from "./Pages/CloseCourse";
-import RegisterCourse from "./Pages/RegisterCourse";
-import RegisterStudent from "./Pages/RegisterStudent";
+import RegisterStudentPage from "./Pages/RegisterStudent";
 import RegisterSR from "./Pages/RegisterSr";
-import Landing from "./Pages/LandingPage";
+import LandingPage from "./Pages/LandingPage";
+import ProfilePage from "./Pages/ProfilePage";
+import StudentRegisterCoursePage from "./Pages/RegisterCourse";
+import AddCourseSRPage from "./Pages/AddCourseSr";
+import ProfilePageSr from './Pages/ProfilePageSr';
+import TradeCoursePage from './Pages/TradeCourse';
 
 import {
   BrowserRouter as Router,
   Route,
   Switch
 } from "react-router-dom";
+
 /*ReactDOM.render(<App />, document.getElementById('root'));*/
 
 // If you want your app to work offline and load faster, you can change
@@ -29,13 +32,17 @@ ReactDOM.render(
     <BackgroundColorWrapper>
       <Router history={history}>
         <Switch>
-          <Route exact path='/' component={Landing} />
-          <Route path="/AddCourse" component={AddCourse} />
-          <Route path="/CloseCourse" component={CloseCourse} />
-          <Route path="/RegisterCourse" component={RegisterCourse} />
-          <Route path="/RegisterStudent" component={RegisterStudent} />
-          <Route path="/RegisterSR" component={RegisterSR} />
+          <Route exact path='/' component={LandingPage} />
           <Route path="/health" component={HealthPage} />
+          {/* Student Pages */}
+          <Route path="/register-student" component={RegisterStudentPage} />
+          <Route path="/profile" component={ProfilePage} />
+          <Route path="/register-course" component={StudentRegisterCoursePage} />
+          <Route path="/trade-course" component={TradeCoursePage} />
+          {/* Student Resources Pages */}
+          <Route path="/register-sr" component={RegisterSR} />
+          <Route path="/sr-profile" component={ProfilePageSr} />
+          <Route path="/sr-add-course" component={AddCourseSRPage} />
         </Switch>
       </Router>
     </BackgroundColorWrapper>
@@ -43,5 +50,3 @@ ReactDOM.render(
   document.getElementById('root')
 );
 serviceWorker.unregister();
-
-//export default App;

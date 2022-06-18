@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import RegisterSU from "../contracts/RegisterSU.json";
-//import { Button } from "reactstrap";
 import getWeb3 from "../getWeb3";
-import { FormGroup, FormControl, Button} from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 
 import '../index.css';
 
@@ -16,12 +15,10 @@ export default class LoginPage extends Component {
             accounts: null,
             contract: null,
             student: null,
-            redirect:null,
+            redirect: null,
             studentResources: null
-            
-
         };
-        this.handleInputChange=this.handleInputChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     componentDidMount = async () => {
@@ -59,7 +56,7 @@ export default class LoginPage extends Component {
 
     handleInputChange(event) {
         this.setState({
-            redirect: "/Register"  + event.target.value
+            redirect: "/Register-" + event.target.value
         });
     }
     submit() {
@@ -68,11 +65,12 @@ export default class LoginPage extends Component {
     }
 
     render() {
-        if (this.state.student || this.state.studentResources) {
+        if (this.state.student) {
             return (
                 <div className="bodyC">
                     <div className="img-wrapper">
-                        <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" />
+                        {/* Change Background Image */}
+                        <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                         <div className="wine-text-container">
                             <div className="site-title wood-text">Register SU</div>
                         </div>
@@ -80,19 +78,37 @@ export default class LoginPage extends Component {
                     <div className="auth-wrapper">
                         <div className="auth-inner">
                             <h1>You are already registered.</h1>
-                            <Button href="/health" className="btn-block" style={{ margin: "2px", backgroundColor: "peru" }} >Health</Button>
+                            <Button href="/profile" className="btn-block" style={{ margin: "2px", backgroundColor: "peru" }} >Go to My Profile</Button>
                         </div>
                     </div>
                 </div>
             );
         }
-        return(
+        else if (this.state.studentResources) {
+            return (
+                <div className="bodyC">
+                    <div className="img-wrapper">
+                        <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
+                        <div className="wine-text-container">
+                            <div className="site-title wood-text">Register SU</div>
+                        </div>
+                    </div>
+                    <div className="auth-wrapper">
+                        <div className="auth-inner">
+                            <h1>You are already registered.</h1>
+                            <Button href="/sr-profile" className="btn-block" style={{ margin: "2px", backgroundColor: "peru" }} >Go to My Profile</Button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        return (
             <div className="bodyC">
-                <a href ="/Help" className="faq" style={{borderRadius: "10%", textDecoration: "none", fontWeight: "bolder"}} >
-                <h3 style={{color: "wheat"}}>Help?</h3>
-                                    </a>
+                <a href="/Help" className="faq" style={{ borderRadius: "10%", textDecoration: "none", fontWeight: "bolder" }} >
+                    <h3 style={{ color: "wheat" }}>Help?</h3>
+                </a>
                 <div className="img-wrapper">
-                    <img src="https://upload.wikimedia.org/wikipedia/tr/d/d3/Sabanc%C4%B1_%C3%9Cniversitesi_logosu.jpg" className="logo" />
+                    <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">RegisterSU</div>
                     </div>
@@ -111,10 +127,10 @@ export default class LoginPage extends Component {
 
                             <div class="form-group" style={{ color: "black" }}>
                                 <label class="control-label" style={{ fontSize: "18px", padding: "2px" }}>Select Role</label>
-                                <select  class="form-control" onChange={this.handleInputChange}>
+                                <select class="form-control" onChange={this.handleInputChange}>
                                     <option selected="true" disabled="disabled">Select Role</option>
-                                    <option value="Student">Student</option>
-                                    <option value="SR">SR</option>
+                                    <option value="student">Student</option>
+                                    <option value="sr">Student Resources</option>
                                 </select>
                             </div>
 
@@ -127,7 +143,7 @@ export default class LoginPage extends Component {
             </div>
         )
 
-        
+
     }
 
 }

@@ -24,10 +24,9 @@ contract RegisterSU {
         address id;
     }
 
-    struct CourseExchangeRequest {
+    struct CourseRequest {
         uint256 reqId;
-        address requesterId;
-        address requestedId;
+        address studentId;
         string courseId;
         string reqCourseId;
         bool status;
@@ -249,7 +248,7 @@ contract RegisterSU {
     {
         return StudentMapping[_address].courses;
     }
-
+    
     function exchangeCourse(address _id, string memory courseId, string memory reqCourseId) public returns (bool){
         // check whether the student already registered or not!
         require(isStudent(msg.sender), "You are not a student!");
@@ -306,5 +305,4 @@ contract RegisterSU {
         
         return isTraded;
     }
-    
 }
