@@ -24,9 +24,10 @@ contract RegisterSU {
         address id;
     }
 
-    struct CourseRequest {
+    struct CourseExchangeRequest {
         uint256 reqId;
-        address studentId;
+        address requesterId;
+        address requestedId;
         string courseId;
         string reqCourseId;
         bool status;
@@ -248,7 +249,7 @@ contract RegisterSU {
     {
         return StudentMapping[_address].courses;
     }
-    
+
     function exchangeCourse(address _id, string memory courseId, string memory reqCourseId) public returns (bool){
         // check whether the student already registered or not!
         require(isStudent(msg.sender), "You are not a student!");
@@ -278,8 +279,7 @@ contract RegisterSU {
             for(uint i=0; i<list.length; i++){
                 if(list[i].requestedId == _id 
                 && keccak256(bytes(list[i].courseId)) == keccak256(bytes(courseId))
-                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))
-                && list[i].status == false){
+                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))){
                     isRequested = false;
                     temp= i;
                     break;
@@ -296,8 +296,7 @@ contract RegisterSU {
         for(uint i=0; i<listRequested.length; i++){
             if(listRequested[i].requestedId == msg.sender 
             && keccak256(bytes(listRequested[i].reqCourseId)) == keccak256(bytes(courseId))
-             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))
-             && listRequested[i].status == false){
+             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))){
                 listRequested[i].status = true;
                 StudentExchangeMapping[msg.sender][temp].status = true;
                 isTraded = true;
@@ -307,4 +306,5 @@ contract RegisterSU {
         
         return isTraded;
     }
+    
 }
