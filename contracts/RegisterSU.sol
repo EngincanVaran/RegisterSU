@@ -279,7 +279,8 @@ contract RegisterSU {
             for(uint i=0; i<list.length; i++){
                 if(list[i].requestedId == _id 
                 && keccak256(bytes(list[i].courseId)) == keccak256(bytes(courseId))
-                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))){
+                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))
+                && list[i].status == false){
                     isRequested = false;
                     temp= i;
                     break;
@@ -296,7 +297,8 @@ contract RegisterSU {
         for(uint i=0; i<listRequested.length; i++){
             if(listRequested[i].requestedId == msg.sender 
             && keccak256(bytes(listRequested[i].reqCourseId)) == keccak256(bytes(courseId))
-             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))){
+             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))
+             && listRequested[i].status == false){
                 listRequested[i].status = true;
                 StudentExchangeMapping[msg.sender][temp].status = true;
                 isTraded = true;
