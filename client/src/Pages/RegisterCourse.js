@@ -100,7 +100,11 @@ export default class StudentRegisterCoursePage extends Component {
         }).then(response => {
             let result = response.events.Enrolled.returnValues;
             if (result) {
-                alert("You successfully registered to " + result["_courseCode"]);
+                if (result["_isEnrolled"]) {
+                    alert("You successfully registered to " + result["_courseCode"]);
+                } else {
+                    alert("You are already registered to " + result["_courseCode"]);
+                }
             } else {
                 alert("Error Occured! Try Again!")
             }

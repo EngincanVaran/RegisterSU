@@ -57,7 +57,7 @@ contract RegisterSU {
     event Registration(address _registrationId);
     event AddingCourse(string _courseCode);
     event CourseStatusChanged(string _courseCode, bool _status);
-    event Enrolled(string _courseCode);
+    event Enrolled(string _courseCode, bool _isEnrolled);
     event TradeResult(bool _result);
 
     constructor() public payable {}
@@ -185,12 +185,26 @@ contract RegisterSU {
                 courses[_courseCode].courseMaxCapacity,
             "Course capacity is full!"
         );
+        bool isEnrolled = true;
 
-        StudentMapping[msg.sender].courses.push(_courseCode);
-        courses[_courseCode].courseCapacity += 1;
-        courseList[courses[_courseCode].index].courseCapacity += 1;
-
-        emit Enrolled(_courseCode);
+        for (
+            uint256 i = 0;
+            i < StudentMapping[msg.sender].courses.length;
+            i++
+        ) {
+            if (
+                keccak256(bytes(StudentMapping[msg.sender].courses[i])) ==
+                keccak256(bytes(_courseCode))
+            ) {
+                isEnrolled = false;
+            }
+        }
+        if (isEnrolled) {
+            StudentMapping[msg.sender].courses.push(_courseCode);
+            courses[_courseCode].courseCapacity += 1;
+            courseList[courses[_courseCode].index].courseCapacity += 1;
+        }
+        emit Enrolled(_courseCode, isEnrolled);
     }
 
     function isStudentResources(address _id) public view returns (bool) {
@@ -273,28 +287,31 @@ contract RegisterSU {
         );
 
         allExchangeList.push(RequestsMapping[requestsCount]);
-        CourseExchangeRequest[] memory list = StudentExchangeMapping[
-            msg.sender
-        ];
-        CourseExchangeRequest[] memory listRequested = StudentExchangeMapping[
-            _id
-        ];
 
         uint256 temp = 0;
-        if (list.length == 0) {
+        if (StudentExchangeMapping[msg.sender].length == 0) {
             temp = 0;
             StudentExchangeMapping[msg.sender].push(
                 RequestsMapping[requestsCount]
             );
         } else {
             bool isRequested = true;
-            for (uint256 i = 0; i < list.length; i++) {
+            for (
+                uint256 i = 0;
+                i < StudentExchangeMapping[msg.sender].length;
+                i++
+            ) {
                 if (
-                    list[i].requestedId == _id &&
-                    keccak256(bytes(list[i].courseId)) ==
+                    StudentExchangeMapping[msg.sender][i].requestedId == _id &&
+                    keccak256(
+                        bytes(StudentExchangeMapping[msg.sender][i].courseId)
+                    ) ==
                     keccak256(bytes(courseId)) &&
-                    keccak256(bytes(list[i].reqCourseId)) ==
-                    keccak256(bytes(reqCourseId))
+                    keccak256(
+                        bytes(StudentExchangeMapping[msg.sender][i].reqCourseId)
+                    ) ==
+                    keccak256(bytes(reqCourseId)) &&
+                    StudentExchangeMapping[msg.sender][i].status == false
                 ) {
                     isRequested = false;
                     temp = i;
@@ -310,15 +327,16 @@ contract RegisterSU {
         }
 
         bool isTraded = false;
-        for (uint256 i = 0; i < listRequested.length; i++) {
+        for (uint256 i = 0; i < StudentExchangeMapping[_id].length; i++) {
             if (
-                listRequested[i].requestedId == msg.sender &&
-                keccak256(bytes(listRequested[i].reqCourseId)) ==
+                StudentExchangeMapping[_id][i].requestedId == msg.sender &&
+                keccak256(bytes(StudentExchangeMapping[_id][i].reqCourseId)) ==
                 keccak256(bytes(courseId)) &&
-                keccak256(bytes(listRequested[i].courseId)) ==
-                keccak256(bytes(reqCourseId))
+                keccak256(bytes(StudentExchangeMapping[_id][i].courseId)) ==
+                keccak256(bytes(reqCourseId)) &&
+                StudentExchangeMapping[_id][i].status == false
             ) {
-                listRequested[i].status = true;
+                StudentExchangeMapping[_id][i].status = true;
                 StudentExchangeMapping[msg.sender][temp].status = true;
                 isTraded = true;
                 break;
