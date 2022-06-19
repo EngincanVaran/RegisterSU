@@ -28,14 +28,17 @@ contract RegisterSU {
         uint256 reqId;
         address studentId;
         string courseId;
+        string reqCourseId;
+        bool status;
     }
 
     mapping(string => Courses) public courses;
     mapping(uint256 => Courses) public courseList;
     mapping(address => Students) public StudentMapping;
     mapping(address => StudentResources) public StudentResourcesMapping;
-    mapping(string => CourseRequest) public RequestsMapping;
-
+    mapping(uint256 => CourseExchangeRequest) public RequestsMapping;
+    mapping(address => CourseExchangeRequest[]) public StudentExchangeMapping;
+    
     mapping(address => bool) public RegisteredAddressMapping;
     mapping(address => bool) public RegisteredStudentsMapping;
     mapping(address => bool) public RegisteredStudentResourcesMapping;
@@ -43,6 +46,7 @@ contract RegisterSU {
 
     address[] public students;
     address[] public studentResources;
+    CourseExchangeRequest[] public allExchangeList;
 
     uint256 private coursesCount;
     uint256 private studentResourcesCount;
@@ -51,7 +55,7 @@ contract RegisterSU {
 
     event Registration(address _registrationId);
     event AddingCourse(string _courseCode);
-    event Courserequested(address _studentId);
+    event Courserequested(address _requesterId);
     event Enrolled();
 
     constructor() public payable {}
@@ -243,5 +247,64 @@ contract RegisterSU {
         returns (string[] memory)
     {
         return StudentMapping[_address].courses;
+    }
+    
+    function exchangeCourse(address _id, string memory courseId, string memory reqCourseId) public returns (bool){
+        // check whether the student already registered or not!
+        require(isStudent(msg.sender), "You are not a student!");
+        require(isStudent(_id), "There is not a student at this address!");
+        require(msg.sender != _id, "You can't exchange courses with yourself!");
+
+        requestsCount++;
+        RequestsMapping[requestsCount] = CourseExchangeRequest(
+            requestsCount,
+            msg.sender,
+            _id,
+            courseId,
+            reqCourseId,
+            false
+        );
+
+        allExchangeList.push(RequestsMapping[requestsCount]);
+        CourseExchangeRequest[] memory list= StudentExchangeMapping[msg.sender];
+        CourseExchangeRequest[] memory listRequested= StudentExchangeMapping[_id];
+
+        uint256 temp = 0;
+        if(list.length == 0){
+            temp = 0;
+            StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
+        }else{
+            bool isRequested = true;
+            for(uint i=0; i<list.length; i++){
+                if(list[i].requestedId == _id 
+                && keccak256(bytes(list[i].courseId)) == keccak256(bytes(courseId))
+                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))
+                && list[i].status == false){
+                    isRequested = false;
+                    temp= i;
+                    break;
+                }
+            }
+            if(isRequested){
+                StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
+                temp = StudentExchangeMapping[msg.sender].length -1;
+            }
+
+        }
+
+        bool isTraded = false;
+        for(uint i=0; i<listRequested.length; i++){
+            if(listRequested[i].requestedId == msg.sender 
+            && keccak256(bytes(listRequested[i].reqCourseId)) == keccak256(bytes(courseId))
+             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))
+             && listRequested[i].status == false){
+                listRequested[i].status = true;
+                StudentExchangeMapping[msg.sender][temp].status = true;
+                isTraded = true;
+                break;
+            }
+        }
+        
+        return isTraded;
     }
 }
