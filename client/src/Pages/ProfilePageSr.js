@@ -41,11 +41,9 @@ export default class ProfilePageSr extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var studentResources = await instance.methods.isStudentResources(currentAccount).call();
-            console.log(studentResources);
 
             if (!studentResources) {
                 this.props.history.push("/")
@@ -62,7 +60,6 @@ export default class ProfilePageSr extends Component {
         try {
             var count = await this.state.contract.methods.getCoursesCount().call();
             count = parseInt(count);
-            console.log("Course Count:" + count);
 
             let tempBody = []
 
@@ -93,7 +90,6 @@ export default class ProfilePageSr extends Component {
                 tempBody.push(temp)
             }
             this.setState({ body: tempBody });
-            // console.log(this.state.body);
 
         } catch (error) {
             alert(
@@ -124,10 +120,13 @@ export default class ProfilePageSr extends Component {
         ).send({
             from: this.state.account,
         }).then(response => {
-            alert(_code + " status is changed from " + _status + " to " + new_status);
+            let result = response.events.CourseStatusChanged.returnValues;
+            if (result) {
+                alert(_code + " status is changed from " + _status + " to " + new_status);
+            } else {
+                alert("Error Occured! Try Again!")
+            }
         });
-
-        //Reload
         window.location.reload(false);
     }
 

@@ -39,11 +39,9 @@ export default class StudentRegisterCoursePage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var student = await instance.methods.isStudent(currentAccount).call();
-            console.log(student);
             if (!student) {
                 this.props.history.push("/")
                 window.location.reload(false);
@@ -62,7 +60,6 @@ export default class StudentRegisterCoursePage extends Component {
         try {
             var count = await this.state.contract.methods.getCoursesCount().call();
             count = parseInt(count);
-            console.log("Course Count:" + count);
 
             let tempBody = [];
             let index = 1
@@ -85,7 +82,6 @@ export default class StudentRegisterCoursePage extends Component {
                 }
             }
             this.setState({ body: tempBody });
-            // console.log(this.state.body);
 
         } catch (error) {
             alert(
@@ -102,9 +98,12 @@ export default class StudentRegisterCoursePage extends Component {
         ).send({
             from: this.state.account,
         }).then(response => {
-            //this.props.history.push("/health");
-            console.log(response)
-            alert("You successfully registered");
+            let result = response.events.Enrolled.returnValues;
+            if (result) {
+                alert("You successfully registered to " + result["_courseCode"]);
+            } else {
+                alert("Error Occured! Try Again!")
+            }
         });
         window.location.reload(false);
     }

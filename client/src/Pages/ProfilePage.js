@@ -37,11 +37,9 @@ export default class ProfilePage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var student = await instance.methods.isStudent(currentAccount).call();
-            console.log(student);
             if (!student) {
                 this.props.history.push("/")
                 window.location.reload(false);
@@ -60,7 +58,6 @@ export default class ProfilePage extends Component {
         try {
             await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
                 .then(response => {
-                    console.log(response)
                     let tempBody = []
                     for (let i = 0; i < response.length; i++) {
                         tempBody.push(

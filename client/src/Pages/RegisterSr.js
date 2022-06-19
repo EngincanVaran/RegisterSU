@@ -33,7 +33,6 @@ export default class LoginPage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
         } catch (error) {
@@ -45,9 +44,6 @@ export default class LoginPage extends Component {
     };
 
     RegisterFunc = async () => {
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         if (this.state.sr_code_input === '') {
             alert("All the fields are compulsory!");
         }
@@ -60,10 +56,15 @@ export default class LoginPage extends Component {
                 .send({
                     from: this.state.currentAccount,
                 }).then(response => {
-                    this.props.history.push("/sr-profile");
+                    let result = response.events.Registration.returnValues;
+                    if (result) {
+                        console.log("Succesfully Registered: " + result["_registrationId"] + " to the system!");
+                    }
+                    else {
+                        alert("Error Occured! Try Again!");
+                    }
                 });
-
-            //Reload
+            this.props.history.push("/sr-profile");
             window.location.reload(false);
         }
     }
@@ -76,7 +77,7 @@ export default class LoginPage extends Component {
         return (
             <div className="bodyC">
                 <div className="img-wrapper">
-                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" alt="Logo" />
+                    <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">Register</div>
                     </div>
@@ -92,9 +93,6 @@ export default class LoginPage extends Component {
                                     </h1>
                                 </div>
                             </div>
-
-
-
                             <div className="form">
                                 <FormGroup>
                                     <div className="form-label">
@@ -102,6 +100,7 @@ export default class LoginPage extends Component {
                                     </div>
                                     <div className="form-input">
                                         <FormControl
+                                            type="password"
                                             input='text'
                                             value={this.state.sr_code_input}
                                             onChange={this.updateCode}

@@ -34,15 +34,12 @@ export default class LoginPage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var studentResources = await this.state.contract.methods.isStudentResources(currentAccount).call();
-            console.log(studentResources);
             this.setState({ studentResources: studentResources });
 
             var student = await this.state.contract.methods.isStudent(currentAccount).call();
-            console.log(student)
             this.setState({ student: student });
 
         } catch (error) {

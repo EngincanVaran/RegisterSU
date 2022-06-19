@@ -39,7 +39,7 @@ contract RegisterSU {
     mapping(address => StudentResources) public StudentResourcesMapping;
     mapping(uint256 => CourseExchangeRequest) public RequestsMapping;
     mapping(address => CourseExchangeRequest[]) public StudentExchangeMapping;
-    
+
     mapping(address => bool) public RegisteredAddressMapping;
     mapping(address => bool) public RegisteredStudentsMapping;
     mapping(address => bool) public RegisteredStudentResourcesMapping;
@@ -56,8 +56,9 @@ contract RegisterSU {
 
     event Registration(address _registrationId);
     event AddingCourse(string _courseCode);
-    event Courserequested(address _requesterId);
-    event Enrolled();
+    event CourseStatusChanged(string _courseCode, bool _status);
+    event Enrolled(string _courseCode);
+    event TradeResult(bool _result);
 
     constructor() public payable {}
 
@@ -171,6 +172,7 @@ contract RegisterSU {
         }
         courses[courseCode].status = courseStatus;
         courseList[courses[courseCode].index].status = courseStatus;
+        emit CourseStatusChanged(courseCode, courseStatus);
     }
 
     function registerToCourse(string memory _courseCode) public {
@@ -188,7 +190,7 @@ contract RegisterSU {
         courses[_courseCode].courseCapacity += 1;
         courseList[courses[_courseCode].index].courseCapacity += 1;
 
-        emit Enrolled();
+        emit Enrolled(_courseCode);
     }
 
     function isStudentResources(address _id) public view returns (bool) {
@@ -250,7 +252,11 @@ contract RegisterSU {
         return StudentMapping[_address].courses;
     }
 
-    function exchangeCourse(address _id, string memory courseId, string memory reqCourseId) public returns (bool){
+    function exchangeCourse(
+        address _id,
+        string memory courseId,
+        string memory reqCourseId
+    ) public returns (bool) {
         // check whether the student already registered or not!
         require(isStudent(msg.sender), "You are not a student!");
         require(isStudent(_id), "There is not a student at this address!");
@@ -267,44 +273,58 @@ contract RegisterSU {
         );
 
         allExchangeList.push(RequestsMapping[requestsCount]);
-        CourseExchangeRequest[] memory list= StudentExchangeMapping[msg.sender];
-        CourseExchangeRequest[] memory listRequested= StudentExchangeMapping[_id];
+        CourseExchangeRequest[] memory list = StudentExchangeMapping[
+            msg.sender
+        ];
+        CourseExchangeRequest[] memory listRequested = StudentExchangeMapping[
+            _id
+        ];
 
         uint256 temp = 0;
-        if(list.length == 0){
+        if (list.length == 0) {
             temp = 0;
-            StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
-        }else{
+            StudentExchangeMapping[msg.sender].push(
+                RequestsMapping[requestsCount]
+            );
+        } else {
             bool isRequested = true;
-            for(uint i=0; i<list.length; i++){
-                if(list[i].requestedId == _id 
-                && keccak256(bytes(list[i].courseId)) == keccak256(bytes(courseId))
-                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))){
+            for (uint256 i = 0; i < list.length; i++) {
+                if (
+                    list[i].requestedId == _id &&
+                    keccak256(bytes(list[i].courseId)) ==
+                    keccak256(bytes(courseId)) &&
+                    keccak256(bytes(list[i].reqCourseId)) ==
+                    keccak256(bytes(reqCourseId))
+                ) {
                     isRequested = false;
-                    temp= i;
+                    temp = i;
                     break;
                 }
             }
-            if(isRequested){
-                StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
-                temp = StudentExchangeMapping[msg.sender].length -1;
+            if (isRequested) {
+                StudentExchangeMapping[msg.sender].push(
+                    RequestsMapping[requestsCount]
+                );
+                temp = StudentExchangeMapping[msg.sender].length - 1;
             }
-
         }
 
         bool isTraded = false;
-        for(uint i=0; i<listRequested.length; i++){
-            if(listRequested[i].requestedId == msg.sender 
-            && keccak256(bytes(listRequested[i].reqCourseId)) == keccak256(bytes(courseId))
-             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))){
+        for (uint256 i = 0; i < listRequested.length; i++) {
+            if (
+                listRequested[i].requestedId == msg.sender &&
+                keccak256(bytes(listRequested[i].reqCourseId)) ==
+                keccak256(bytes(courseId)) &&
+                keccak256(bytes(listRequested[i].courseId)) ==
+                keccak256(bytes(reqCourseId))
+            ) {
                 listRequested[i].status = true;
                 StudentExchangeMapping[msg.sender][temp].status = true;
                 isTraded = true;
                 break;
             }
         }
-        
+        emit TradeResult(isTraded);
         return isTraded;
     }
-    
 }
