@@ -3,8 +3,9 @@ import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
-    Spinner
+    Spinner,
 } from "reactstrap";
+import { FormGroup, FormControl, Button } from 'react-bootstrap'
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -20,7 +21,12 @@ export default class TradeCoursePage extends Component {
             student: null,
             studentName: '',
             studentId: '',
-            body: []
+            acc1: '',
+            acc2: '',
+            course1: '',
+            course2: '',
+            body: [],
+            all_courses:[]
         };
 
     }
@@ -55,6 +61,55 @@ export default class TradeCoursePage extends Component {
         } catch (error) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
+            );
+            console.error(error);
+        }
+        try {
+            await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
+                .then(response => {
+                    console.log(response)
+                    let tempBody = []
+                    for (let i = 0; i < response.length; i++) {
+                        tempBody.push(
+                            {
+                                "label": i + 1,
+                                "value": response[i]
+                            }
+                        )
+                    }
+                    this.setState({ body: tempBody })
+                });
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+            var count = await this.state.contract.methods.getCoursesCount().call();
+            count = parseInt(count);
+            console.log("Course Count:" + count);
+
+            let tempBody2 = [];
+            let index = 1
+            for (var i = 0; i < count; i++) {
+                let code = await this.state.contract.methods.getCourseCode(i).call();
+                let status = await this.state.contract.methods.getCourseStatus(i).call();
+
+                let action = null
+                if (status) {
+                    tempBody2.push(
+                        {
+                            "label": i + 1,
+                            "value": code
+                        }
+                    )
+                }
+            }
+            this.setState({ all_courses: tempBody2 });
+
+        } catch (error) {
+            alert(
+                `Failed to fetch courseData.`,
             );
             console.error(error);
         }
@@ -112,7 +167,49 @@ export default class TradeCoursePage extends Component {
                     </div >
                 </div >
                 <br></br>
-                <h1>Trade Course</h1>
+                <div className="form">
+
+                                <FormGroup>
+                                    <div className="form-label">
+                                        Enter Trader's Address
+                                    </div>
+                                    <div className="form-input">
+                                        <FormControl
+                                            input='text'
+                                            //value={this.state.acc2}
+                                            //onChange={this.acc2}
+                                        />
+                                    </div>
+                                </FormGroup>
+
+                                <FormGroup>
+                                <div className="form-label">
+                                    Select Course Code to send
+                                </div>
+                                    <select>
+                                        {this.state.body.map((option) => (
+                                        <option value={option.value}>{option.value}</option>
+                                        ))}
+                                    </select>                                   
+                                </FormGroup>
+
+                                <FormGroup>
+                                <div className="form-label">
+                                    Select Course Code to receive
+                                </div>
+                                    <select>
+                                        {this.state.all_courses.map((option) => (
+                                        <option value={option.value}>{option.value}</option>
+                                        ))}
+                                    </select>                                   
+                                </FormGroup>
+                                
+
+                                <br></br>
+                                <button type="button" class="btn btn-warning">Trade</button>
+
+                                
+                                </div >
             </>
 
         );
