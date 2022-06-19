@@ -270,79 +270,64 @@ contract RegisterSU {
         address _id,
         string memory courseId,
         string memory reqCourseId
-    ) public returns (bool) {
-        // check whether the student already registered or not!
+    ) public {
         require(isStudent(msg.sender), "You are not a student!");
         require(isStudent(_id), "There is not a student at this address!");
         require(msg.sender != _id, "You can't exchange courses with yourself!");
 
-        requestsCount++;
-        RequestsMapping[requestsCount] = CourseExchangeRequest(
-            requestsCount,
-            msg.sender,
-            _id,
-            courseId,
-            reqCourseId,
-            false
-        );
+        bool isTraded = false;
 
-        allExchangeList.push(RequestsMapping[requestsCount]);
-
-        uint256 temp = 0;
-        if (StudentExchangeMapping[msg.sender].length == 0) {
-            temp = 0;
-            StudentExchangeMapping[msg.sender].push(
-                RequestsMapping[requestsCount]
-            );
-        } else {
-            bool isRequested = true;
-            for (
-                uint256 i = 0;
-                i < StudentExchangeMapping[msg.sender].length;
-                i++
+        for (uint256 i = 0; i < requestsCount; i++) {
+            if (
+                msg.sender == RequestsMapping[i].requestedId &&
+                _id == RequestsMapping[i].requesterId &&
+                keccak256(bytes(RequestsMapping[i].reqCourseId)) ==
+                keccak256(bytes(courseId)) &&
+                keccak256(bytes(RequestsMapping[i].courseId)) ==
+                keccak256(bytes(reqCourseId))
             ) {
-                if (
-                    StudentExchangeMapping[msg.sender][i].requestedId == _id &&
-                    keccak256(
-                        bytes(StudentExchangeMapping[msg.sender][i].courseId)
-                    ) ==
-                    keccak256(bytes(courseId)) &&
-                    keccak256(
-                        bytes(StudentExchangeMapping[msg.sender][i].reqCourseId)
-                    ) ==
-                    keccak256(bytes(reqCourseId)) &&
-                    StudentExchangeMapping[msg.sender][i].status == false
+                isTraded = true;
+                // fix sender course
+                for (
+                    uint256 j = 0;
+                    j < StudentMapping[msg.sender].courses.length;
+                    j++
                 ) {
-                    isRequested = false;
-                    temp = i;
-                    break;
+                    if (
+                        keccak256(
+                            bytes(StudentMapping[msg.sender].courses[j])
+                        ) == (keccak256(bytes(courseId)))
+                    ) {
+                        StudentMapping[msg.sender].courses[j] = reqCourseId;
+                    }
+                }
+                // fix reciever course
+                for (
+                    uint256 j = 0;
+                    j < StudentMapping[_id].courses.length;
+                    j++
+                ) {
+                    if (
+                        keccak256(bytes(StudentMapping[_id].courses[j])) ==
+                        (keccak256(bytes(reqCourseId)))
+                    ) {
+                        StudentMapping[_id].courses[j] = courseId;
+                    }
                 }
             }
-            if (isRequested) {
-                StudentExchangeMapping[msg.sender].push(
-                    RequestsMapping[requestsCount]
-                );
-                temp = StudentExchangeMapping[msg.sender].length - 1;
-            }
         }
 
-        bool isTraded = false;
-        for (uint256 i = 0; i < StudentExchangeMapping[_id].length; i++) {
-            if (
-                StudentExchangeMapping[_id][i].requestedId == msg.sender &&
-                keccak256(bytes(StudentExchangeMapping[_id][i].reqCourseId)) ==
-                keccak256(bytes(courseId)) &&
-                keccak256(bytes(StudentExchangeMapping[_id][i].courseId)) ==
-                keccak256(bytes(reqCourseId)) &&
-                StudentExchangeMapping[_id][i].status == false
-            ) {
-                StudentExchangeMapping[_id][i].status = true;
-                StudentExchangeMapping[msg.sender][temp].status = true;
-                isTraded = true;
-                break;
-            }
+        if (!isTraded) {
+            RequestsMapping[requestsCount] = CourseExchangeRequest(
+                requestsCount,
+                msg.sender,
+                _id,
+                courseId,
+                reqCourseId,
+                false
+            );
+            requestsCount++;
         }
         emit TradeResult(isTraded);
-        return isTraded;
     }
 }
