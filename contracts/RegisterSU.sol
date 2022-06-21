@@ -24,9 +24,10 @@ contract RegisterSU {
         address id;
     }
 
-    struct CourseRequest {
+    struct CourseExchangeRequest {
         uint256 reqId;
-        address studentId;
+        address requesterId;
+        address requestedId;
         string courseId;
         string reqCourseId;
         bool status;
@@ -38,7 +39,7 @@ contract RegisterSU {
     mapping(address => StudentResources) public StudentResourcesMapping;
     mapping(uint256 => CourseExchangeRequest) public RequestsMapping;
     mapping(address => CourseExchangeRequest[]) public StudentExchangeMapping;
-    
+
     mapping(address => bool) public RegisteredAddressMapping;
     mapping(address => bool) public RegisteredStudentsMapping;
     mapping(address => bool) public RegisteredStudentResourcesMapping;
@@ -55,8 +56,10 @@ contract RegisterSU {
 
     event Registration(address _registrationId);
     event AddingCourse(string _courseCode);
-    event Courserequested(address _requesterId);
-    event Enrolled();
+    event CourseStatusChanged(string _courseCode, bool _status);
+    event Enrolled(string _courseCode, bool _isEnrolled);
+    event TradeResult(bool _result);
+    event Drop(string _courseCode, bool _canDrop);
 
     constructor() public payable {}
 
@@ -170,6 +173,7 @@ contract RegisterSU {
         }
         courses[courseCode].status = courseStatus;
         courseList[courses[courseCode].index].status = courseStatus;
+        emit CourseStatusChanged(courseCode, courseStatus);
     }
 
     function registerToCourse(string memory _courseCode) public {
@@ -182,12 +186,53 @@ contract RegisterSU {
                 courses[_courseCode].courseMaxCapacity,
             "Course capacity is full!"
         );
+        bool isEnrolled = true;
 
-        StudentMapping[msg.sender].courses.push(_courseCode);
-        courses[_courseCode].courseCapacity += 1;
-        courseList[courses[_courseCode].index].courseCapacity += 1;
+        for (
+            uint256 i = 0;
+            i < StudentMapping[msg.sender].courses.length;
+            i++
+        ) {
+            if (
+                keccak256(bytes(StudentMapping[msg.sender].courses[i])) ==
+                keccak256(bytes(_courseCode))
+            ) {
+                isEnrolled = false;
+            }
+        }
+        if (isEnrolled) {
+            StudentMapping[msg.sender].courses.push(_courseCode);
+            courses[_courseCode].courseCapacity += 1;
+            courseList[courses[_courseCode].index].courseCapacity += 1;
+        }
+        emit Enrolled(_courseCode, isEnrolled);
+    }
 
-        emit Enrolled();
+
+
+    function dropCourse(string memory _courseCode) public {
+        // check whether the student already registered or not!
+        require(isStudent(msg.sender), "You are not a student!");
+        require(isCourseAddedBefore(_courseCode), "There is no such course!");
+        require(courses[_courseCode].status, "Course is not open");
+
+        bool canDrop = false;
+        for (
+            uint256 i = 0;
+            i < StudentMapping[msg.sender].courses.length;
+            i++
+        ) {
+            if (
+                keccak256(bytes(StudentMapping[msg.sender].courses[i])) ==
+                keccak256(bytes(_courseCode))
+            ) {
+                StudentMapping[msg.sender].courses[i] = StudentMapping[msg.sender].courses[StudentMapping[msg.sender].courses.length-1];
+                StudentMapping[msg.sender].courses.pop();
+                canDrop = true;
+            }
+        }
+
+        emit Drop(_courseCode, canDrop);
     }
 
     function isStudentResources(address _id) public view returns (bool) {
@@ -248,63 +293,69 @@ contract RegisterSU {
     {
         return StudentMapping[_address].courses;
     }
-    
-    function exchangeCourse(address _id, string memory courseId, string memory reqCourseId) public returns (bool){
-        // check whether the student already registered or not!
+
+    function exchangeCourse(
+        address _id,
+        string memory courseId,
+        string memory reqCourseId
+    ) public {
         require(isStudent(msg.sender), "You are not a student!");
         require(isStudent(_id), "There is not a student at this address!");
         require(msg.sender != _id, "You can't exchange courses with yourself!");
 
-        requestsCount++;
-        RequestsMapping[requestsCount] = CourseExchangeRequest(
-            requestsCount,
-            msg.sender,
-            _id,
-            courseId,
-            reqCourseId,
-            false
-        );
+        bool isTraded = false;
 
-        allExchangeList.push(RequestsMapping[requestsCount]);
-        CourseExchangeRequest[] memory list= StudentExchangeMapping[msg.sender];
-        CourseExchangeRequest[] memory listRequested= StudentExchangeMapping[_id];
-
-        uint256 temp = 0;
-        if(list.length == 0){
-            temp = 0;
-            StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
-        }else{
-            bool isRequested = true;
-            for(uint i=0; i<list.length; i++){
-                if(list[i].requestedId == _id 
-                && keccak256(bytes(list[i].courseId)) == keccak256(bytes(courseId))
-                && keccak256(bytes(list[i].reqCourseId)) == keccak256(bytes(reqCourseId))
-                && list[i].status == false){
-                    isRequested = false;
-                    temp= i;
-                    break;
+        for (uint256 i = 0; i < requestsCount; i++) {
+            if (
+                msg.sender == RequestsMapping[i].requestedId &&
+                _id == RequestsMapping[i].requesterId &&
+                keccak256(bytes(RequestsMapping[i].reqCourseId)) ==
+                keccak256(bytes(courseId)) &&
+                keccak256(bytes(RequestsMapping[i].courseId)) ==
+                keccak256(bytes(reqCourseId))
+            ) {
+                isTraded = true;
+                // fix sender course
+                for (
+                    uint256 j = 0;
+                    j < StudentMapping[msg.sender].courses.length;
+                    j++
+                ) {
+                    if (
+                        keccak256(
+                            bytes(StudentMapping[msg.sender].courses[j])
+                        ) == (keccak256(bytes(courseId)))
+                    ) {
+                        StudentMapping[msg.sender].courses[j] = reqCourseId;
+                    }
+                }
+                // fix reciever course
+                for (
+                    uint256 j = 0;
+                    j < StudentMapping[_id].courses.length;
+                    j++
+                ) {
+                    if (
+                        keccak256(bytes(StudentMapping[_id].courses[j])) ==
+                        (keccak256(bytes(reqCourseId)))
+                    ) {
+                        StudentMapping[_id].courses[j] = courseId;
+                    }
                 }
             }
-            if(isRequested){
-                StudentExchangeMapping[msg.sender].push(RequestsMapping[requestsCount]);
-                temp = StudentExchangeMapping[msg.sender].length -1;
-            }
-
         }
 
-        bool isTraded = false;
-        for(uint i=0; i<listRequested.length; i++){
-            if(listRequested[i].requestedId == msg.sender 
-            && keccak256(bytes(listRequested[i].reqCourseId)) == keccak256(bytes(courseId))
-             && keccak256(bytes(listRequested[i].courseId)) == keccak256(bytes(reqCourseId))
-             && listRequested[i].status == false){
-                listRequested[i].status = true;
-                StudentExchangeMapping[msg.sender][temp].status = true;
-                isTraded = true;
-                break;
-            }
+        if (!isTraded) {
+            RequestsMapping[requestsCount] = CourseExchangeRequest(
+                requestsCount,
+                msg.sender,
+                _id,
+                courseId,
+                reqCourseId,
+                false
+            );
+            requestsCount++;
         }
-        
-        return isTraded;
+        emit TradeResult(isTraded);
     }
 }
