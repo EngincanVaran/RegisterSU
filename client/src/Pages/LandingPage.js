@@ -101,8 +101,8 @@ export default class LoginPage extends Component {
         }
         return (
             <div className="bodyC">
-                <a href="/Help" className="faq" style={{ borderRadius: "10%", textDecoration: "none", fontWeight: "bolder" }} >
-                    <h3 style={{ color: "wheat" }}>Help?</h3>
+                <a href="/health" className="faq" style={{ borderRadius: "10%", textDecoration: "none", fontWeight: "bolder" }} >
+                    <h3 style={{ color: "wheat" }}>Health</h3>
                 </a>
                 <div className="img-wrapper">
                     <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
