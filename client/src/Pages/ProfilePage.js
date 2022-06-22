@@ -80,6 +80,27 @@ export default class ProfilePage extends Component {
         window.location.reload(false);
     }
 
+    dropCourse = async (_courseCode) => {
+        await this.state.contract.methods.dropCourse(
+            _courseCode
+        ).send({
+            from: this.state.account,
+        }).then(response => {
+            let result = response.events.Drop.returnValues;
+            console.log(result);
+            if (result) {
+                if (result["_canDrop"]) {
+                    alert("You successfully dropped " + result["_courseCode"]);
+                } else {
+                    alert("An error occured please try again!");
+                }
+            } else {
+                alert("Error Occured! Try Again!")
+            }
+        });
+        window.location.reload(false);
+    }
+
     render() {
         if (!this.state.web3) {
             return (
@@ -140,6 +161,15 @@ export default class ProfilePage extends Component {
                                 <tr key={item.indices}>
                                     <td>{item.indices}</td>
                                     <td>{item.code}</td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm"
+                                            onClick={() => this.dropCourse(item.code)}
+                                        >
+                                            Drop
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })}

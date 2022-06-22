@@ -59,6 +59,7 @@ contract RegisterSU {
     event CourseStatusChanged(string _courseCode, bool _status);
     event Enrolled(string _courseCode, bool _isEnrolled);
     event TradeResult(bool _result);
+    event Drop(string _courseCode, bool _canDrop);
 
     constructor() public payable {}
 
@@ -329,5 +330,38 @@ contract RegisterSU {
             requestsCount++;
         }
         emit TradeResult(isTraded);
+    }
+
+    function dropCourse(string memory _courseCode) public {
+        // check whether the student already registered or not!
+        require(isStudent(msg.sender), "You are not a student!");
+        require(isCourseAddedBefore(_courseCode), "There is no such course!");
+        require(courses[_courseCode].status, "Course is not open");
+
+        bool canDrop = false;
+        for (
+            uint256 i = 0;
+            i < StudentMapping[msg.sender].courses.length;
+            i++
+        ) {
+            if (
+                keccak256(bytes(StudentMapping[msg.sender].courses[i])) ==
+                keccak256(bytes(_courseCode))
+            ) {
+                StudentMapping[msg.sender].courses[i] = StudentMapping[
+                    msg.sender
+                ].courses[StudentMapping[msg.sender].courses.length - 1];
+                StudentMapping[msg.sender].courses.pop();
+                canDrop = true;
+                courses[_courseCode].courseCapacity =
+                    courses[_courseCode].courseCapacity -
+                    1;
+                courseList[courses[_courseCode].index].courseCapacity = courses[
+                    _courseCode
+                ].courseCapacity;
+            }
+        }
+
+        emit Drop(_courseCode, canDrop);
     }
 }
