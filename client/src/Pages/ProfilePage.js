@@ -37,11 +37,9 @@ export default class ProfilePage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var student = await instance.methods.isStudent(currentAccount).call();
-            console.log(student);
             if (!student) {
                 this.props.history.push("/")
                 window.location.reload(false);
@@ -60,7 +58,6 @@ export default class ProfilePage extends Component {
         try {
             await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
                 .then(response => {
-                    console.log(response)
                     let tempBody = []
                     for (let i = 0; i < response.length; i++) {
                         tempBody.push(
@@ -80,6 +77,27 @@ export default class ProfilePage extends Component {
 
     nagivateToPage = async (path) => {
         this.props.history.push(path)
+        window.location.reload(false);
+    }
+
+    dropCourse = async (_courseCode) => {
+        await this.state.contract.methods.dropCourse(
+            _courseCode
+        ).send({
+            from: this.state.account,
+        }).then(response => {
+            let result = response.events.Drop.returnValues;
+            console.log(result);
+            if (result) {
+                if (result["_canDrop"]) {
+                    alert("You successfully dropped " + result["_courseCode"]);
+                } else {
+                    alert("An error occured please try again!");
+                }
+            } else {
+                alert("Error Occured! Try Again!")
+            }
+        });
         window.location.reload(false);
     }
 
@@ -143,6 +161,15 @@ export default class ProfilePage extends Component {
                                 <tr key={item.indices}>
                                     <td>{item.indices}</td>
                                     <td>{item.code}</td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm"
+                                            onClick={() => this.dropCourse(item.code)}
+                                        >
+                                            Drop
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })}

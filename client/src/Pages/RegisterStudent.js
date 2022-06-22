@@ -36,15 +36,12 @@ export default class RegisterStudentPage extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
 
             var studentResources = await this.state.contract.methods.isStudentResources(currentAccount).call();
-            console.log(studentResources);
             this.setState({ studentResources: studentResources });
 
             var student = await this.state.contract.methods.isStudent(currentAccount).call();
-            console.log(student)
             this.setState({ student: student });
 
         } catch (error) {
@@ -56,10 +53,6 @@ export default class RegisterStudentPage extends Component {
     };
 
     RegisterFunc = async () => {
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-
         if (this.state.username === '' || this.state.id === '') {
             alert("All the fields are compulsory!");
         }
@@ -68,15 +61,18 @@ export default class RegisterStudentPage extends Component {
                 this.state.maxCourseNumber,
                 this.state.id,
                 this.state.username
-            )
-
-                .send({
-                    from: this.state.account,
-                }).then(response => {
-                    this.props.history.push("/profile");
-                });
-
-            //Reload
+            ).send({
+                from: this.state.currentAccount,
+            }).then(response => {
+                let result = response.events.Registration.returnValues;
+                if (result) {
+                    console.log("Succesfully Registered: " + result["_registrationId"] + " to the system!");
+                }
+                else {
+                    alert("Error Occured! Try Again!");
+                }
+            });
+            this.props.history.push("/profile");
             window.location.reload(false);
         }
     }
@@ -111,7 +107,7 @@ export default class RegisterStudentPage extends Component {
         return (
             <div className="bodyC">
                 <div className="img-wrapper">
-                    <img src="https://i.pinimg.com/originals/71/6e/00/716e00537e8526347390d64ec900107d.png" className="logo" alt="Logo" />
+                    <img src={require("../components/su_logo.jpg")} className="logo" alt="Logo" />
                     <div className="wine-text-container">
                         <div className="site-title wood-text">Register</div>
                     </div>

@@ -51,11 +51,8 @@ export default class ProfilePageSr extends Component {
             this.setState({ contract: instance, web3: web3, account: accounts[0] });
 
             const currentAccount = await web3.currentProvider.selectedAddress
-            console.log(currentAccount)
             this.setState({ currentAccount: currentAccount });
-
             var studentResources = await instance.methods.isStudentResources(currentAccount).call();
-            console.log(studentResources);
 
             if (!studentResources) {
                 this.props.history.push("/")
@@ -82,12 +79,16 @@ export default class ProfilePageSr extends Component {
             ).send({
                 from: this.state.account,
             }).then(response => {
-                console.log(response.events.AddingCourse.returnValues)
-                alert("You successfully added a course");
-            });
+                let result = response.events.AddingCourse.returnValues
+                if (result) {
+                    alert("You successfully added " + result["_courseCode"] + " to the system!");
+                }
+                else {
+                    alert("Error Occured! Try Again!");
+                }
 
-            //Reload
-            //window.location.reload(false);
+            });
+            window.location.reload(false);
         }
     }
 

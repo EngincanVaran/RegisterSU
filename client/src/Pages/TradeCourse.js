@@ -3,8 +3,9 @@ import '../index.css';
 import RegisterSU from "../contracts/RegisterSU.json";
 import getWeb3 from "../getWeb3";
 import {
-    Spinner
+    Spinner,
 } from "reactstrap";
+import { FormGroup, FormControl } from 'react-bootstrap'
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -20,7 +21,11 @@ export default class TradeCoursePage extends Component {
             student: null,
             studentName: '',
             studentId: '',
-            body: []
+            reciever: '',
+            senderCourse: '',
+            recieverCourse: '',
+            studentCourses: [],
+            allCourses: []
         };
 
     }
@@ -58,11 +63,110 @@ export default class TradeCoursePage extends Component {
             );
             console.error(error);
         }
+        try {
+            await this.state.contract.methods.getStudentCourses(this.state.currentAccount).call()
+                .then(response => {
+                    let tempBody = []
+                    for (let i = 0; i < response.length; i++) {
+                        tempBody.push(
+                            {
+                                "label": i + 1,
+                                "value": response[i]
+                            }
+                        )
+                    }
+                    this.setState({ studentCourses: tempBody })
+                });
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+            var count = await this.state.contract.methods.getCoursesCount().call();
+            count = parseInt(count);
+            console.log("Course Count:" + count);
+
+            let tempBody2 = [];
+            for (var i = 0; i < count; i++) {
+                let code = await this.state.contract.methods.getCourseCode(i).call();
+                let status = await this.state.contract.methods.getCourseStatus(i).call();
+                if (status) {
+                    tempBody2.push(
+                        {
+                            "label": i + 1,
+                            "value": code
+                        }
+                    )
+                }
+            }
+            this.setState({ allCourses: tempBody2 });
+
+        } catch (error) {
+            alert(
+                `Failed to fetch courseData.`,
+            );
+            console.error(error);
+        }
     };
 
     nagivateToPage = async (path) => {
         this.props.history.push(path)
         window.location.reload(false);
+    }
+
+    handleChange = event => {
+        this.setState({ reciever: event.target.value })
+    }
+
+    doTrade = async () => {
+
+        if (!this.state.reciever || this.state.reciever === "") {
+            alert("Please Provide Reciever Details!")
+        } else if (!this.state.senderCourse || this.state.senderCourse === "") {
+            alert("Please Provide Your Course Details!")
+        } else if (!this.state.recieverCourse || this.state.recieverCourse === "") {
+            alert("Please Provide Your Wanted Course Details!")
+        } else if (this.state.senderCourse === this.state.recieverCourse) {
+            alert("Sending and recieving the same course. Cancelling transaction!")
+        }
+        else {
+            console.log("Sender: " + this.state.currentAccount);
+            console.log("Reciever: " + this.state.reciever);
+            console.log("SenderCourse: " + this.state.senderCourse);
+            console.log("RecieverCourse: " + this.state.recieverCourse);
+
+            await this.state.contract.methods.exchangeCourse(
+                this.state.reciever,
+                this.state.senderCourse,
+                this.state.recieverCourse
+            ).send({
+                from: this.state.currentAccount,
+            }).then(response => {
+                let result = response.events.TradeResult.returnValues;
+                if (result) {
+                    let traded = result["_result"]
+                    if (!traded) {
+                        alert("Trade request sent to " + this.state.reciever + " from you!");
+                    } else {
+                        alert("Traded courses with" + this.state.reciever + "!");
+                    }
+                } else {
+                    alert("Error Occured! Try Again!")
+                }
+
+                console.log(response)
+            });
+
+        }
+    }
+
+    handleSenderCourseSelect = (event) => {
+        this.setState({ senderCourse: event.target.value })
+    }
+
+    handleRecieverCourseSelect = (event) => {
+        this.setState({ recieverCourse: event.target.value })
     }
 
     render() {
@@ -112,7 +216,57 @@ export default class TradeCoursePage extends Component {
                     </div >
                 </div >
                 <br></br>
-                <h1>Trade Course</h1>
+                <div className="form">
+
+                    <FormGroup>
+                        <div className="form-label">
+                            Enter Trader's Address
+                        </div>
+                        <div className="form-input">
+                            <FormControl
+                                input='text'
+                                value={this.state.reciever}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <div className="form-label">
+                            Select Course Code to send
+                        </div>
+                        <select
+                            onChange={this.handleSenderCourseSelect}>
+                            <option value="" disabled selected>Select your option</option>
+                            {this.state.studentCourses.map((option) => (
+                                <option
+                                    value={option.value}
+                                >
+                                    {option.value}
+                                </option>
+                            ))}
+                        </select>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <div className="form-label">
+                            Select Course Code to receive
+                        </div>
+                        <select
+                            onChange={this.handleRecieverCourseSelect}>
+                            <option value="" disabled selected>Select your option</option>
+                            {this.state.allCourses.map((option) => (
+                                <option
+                                    value={option.value}
+                                >
+                                    {option.value}
+                                </option>
+                            ))}
+                        </select>
+                    </FormGroup>
+                    <br></br>
+                    <button type="button" class="btn btn-warning" onClick={() => this.doTrade()}>Trade</button>
+                </div >
             </>
 
         );
